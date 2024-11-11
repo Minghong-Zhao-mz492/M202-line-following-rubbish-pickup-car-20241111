@@ -30,6 +30,15 @@ This project is an Arduino-based robotic car designed to follow a line and pick 
 - `include/` - Header files for various functionalities (some files are currently under development).
 - `docs/` - Documentation and design notes.
 
+## Required Libraries
+
+- **Adafruit Motor Shield Library**: This project uses the Adafruit Motor Shield library to control the motors. 
+
+### Installation Instructions
+1. Open the Arduino IDE.
+2. Go to **Sketch** > **Include Library** > **Manage Libraries**.
+3. In the Library Manager, search for "Adafruit Motor Shield" and install the latest version.
+
 ## Current Status
 This project is currently under development. Some features and files, like header files and sensor code, are not yet complete.
 
