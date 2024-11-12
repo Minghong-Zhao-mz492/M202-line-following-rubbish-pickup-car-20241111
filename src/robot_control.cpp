@@ -60,3 +60,36 @@ void runRightMotor(char direction, int speed, float distance) {
     delay(time * 1000);
     rightMotor->run(RELEASE);
 }
+
+void runCar(char direction, int speed, float distance) {
+    runLeftMotor(direction, speed, distance);
+    runRightMotor(direction, speed, distance);
+}
+
+void turn(char direction, float degrees) {
+    // Step 1: Move the car forward a bit (optional, depending on your requirement)
+    runCar('F', 300, CAR_LENGTH);
+    
+    // Stop the car momentarily
+    runCar('F', 0, 1);
+
+    // Step 2: Determine turn based on direction ('R' for right, 'L' for left)
+    if (direction == 'R') {
+        // Right turn: Left motor moves forward, Right motor moves backward
+        runLeftMotor('F', 200, PI * ROTATIONAL_RADIUS * (degrees / 180.0));
+        runRightMotor('B', 200, PI * ROTATIONAL_RADIUS * (degrees / 180.0));
+    } else if (direction == 'L') {
+        // Left turn: Right motor moves forward, Left motor moves backward
+        runLeftMotor('B', 200, PI* ROTATIONAL_RADIUS * (degrees / 180.0));
+        runRightMotor('F', 200, PI * ROTATIONAL_RADIUS * (degrees / 180.0));
+    } else if (direction == 'B') {
+        // Backward turn: Left motor moves forward, Right motor moves backward
+    runLeftMotor('F', 200, PI * ROTATIONAL_RADIUS);
+    runRightMotor('B', 200, PI * ROTATIONAL_RADIUS);
+    }
+
+    // Stop the car after turning
+    runCar('F', 0, 1);
+}
+
+
