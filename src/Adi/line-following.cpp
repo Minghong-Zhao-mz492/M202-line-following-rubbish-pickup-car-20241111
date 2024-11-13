@@ -1,7 +1,3 @@
-
-
-
-
 void keep_straight() {
   //car is on path so goes straight
   leftMotor->run(FORWARD);
