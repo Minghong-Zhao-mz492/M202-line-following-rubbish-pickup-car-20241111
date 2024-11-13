@@ -1,3 +1,8 @@
+void align_left();
+void align_left();
+
+
+
 void keep_straight() {
   //car is on path so goes straight
   leftMotor->run(FORWARD);
