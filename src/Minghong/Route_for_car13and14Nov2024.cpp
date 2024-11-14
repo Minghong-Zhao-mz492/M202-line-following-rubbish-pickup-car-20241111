@@ -227,7 +227,7 @@ void turnByMiddle(char direction, float degrees) {
 
     Serial.println("Car is turning!");
     // Step 2: Determine turn based on direction ('R' for right, 'L' for left)
-    float turnDistance = 3.14 * ROTATIONAL_RADIUS * (degrees / 180.0);  // Calculate turn distance
+    float turnDistance = 3.14 * ROTATIONAL_RADIUS * (degrees / 180.0)*1.21;  // Calculate turn distance
     Serial.println(turnDistance);
     unsigned long startTime = millis();                               // Start timing for the turn
     float time = calculateRunTime(turnDistance, calculateRealSpeed(200));  // Calculate time for turn
@@ -269,7 +269,7 @@ void turnByOneSide(char direction, float degrees) {
 
     Serial.println("Car is turning!");
     // Step 2: Determine turn based on direction ('R' for right, 'L' for left)
-    float turnDistance = 3.14 * ROTATIONAL_RADIUS * 2 * (degrees / 180.0);  // Calculate turn distance
+    float turnDistance = 3.14 * ROTATIONAL_RADIUS * 2 * (degrees / 180.0)*1.3;  // Calculate turn distance
     Serial.println(turnDistance);
     unsigned long startTime = millis();                               // Start timing for the turn
     float time = calculateRunTime(turnDistance, calculateRealSpeed(200));  // Calculate time for turn
@@ -279,7 +279,7 @@ void turnByOneSide(char direction, float degrees) {
         // Right turn: Left motor moves forward, Right motor moves backward
         leftMotor->run(FORWARD);
         // rightMotor->run(BACKWARD);
-        leftMotor->setSpeed(200);
+        leftMotor->setSpeed(200-RIGHT_LEFT_TURN_DIFFERENCE);
         rightMotor->setSpeed(0);
     } else if (direction == 'L') {
         // Left turn: Right motor moves forward, Left motor moves backward
@@ -291,8 +291,6 @@ void turnByOneSide(char direction, float degrees) {
         Serial.println("Invalid direction. Use 'R' for right, 'L' for left, or 'B' for backward.");
         return;
     }
-
-  
 
     // Run both motors for the calculated turn time
     while (millis() - startTime < time * 1000) {
