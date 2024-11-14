@@ -199,8 +199,6 @@ void turnByOneSide(char direction, float degrees) {
         return;
     }
 
-  
-
     // Run both motors for the calculated turn time
     while (millis() - startTime < time * 1000) {
         // Wait until the calculated turn time has passed
