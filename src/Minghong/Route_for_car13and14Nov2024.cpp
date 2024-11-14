@@ -104,26 +104,6 @@ void drop_rubbish() {
     Serial.println("Dropping rubbish.");
 }
 
-// Define oneToGreen function
-void oneToGreen() {
-    keep_straight();
-    forward_and_turn('R', 90);
-    keep_straight();
-    forward_and_turn('R', 90);
-    keep_straight();
-    forward_and_turn('R', 90);
-    keep_straight();
-    forward_and_turn('R', 90);
-    
-    runCar('F', 150, 30);  // Move forward to align for drop
-    drop_rubbish();
-    
-    // Move backward to clear drop zone by CAR_WIDTH / 2
-    runCar('B', 150, 30 + CAR_WIDTH / 2);
-    turnByOneSide('L', 90);  // Turn left by one side
-    keep_straight();
-}
-
 
 void initializeMotors() {
     Serial.begin(9600);
@@ -324,6 +304,10 @@ void continue_straight() {
 
 void stop_car() {
   runCar('F',0,12);
+}
+
+void drop_rubbish() {
+  Serial.println('dropping rubbish');
 }
 
 // Define oneToGreen function
