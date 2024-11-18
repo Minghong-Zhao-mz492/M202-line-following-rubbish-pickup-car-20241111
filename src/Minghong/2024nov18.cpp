@@ -96,15 +96,6 @@ void keep_straight() {
   }
 }
 
-void pick_up_rubbish() {
-    Serial.println("Picking up rubbish.");
-}
-
-void drop_rubbish() {
-    Serial.println("Dropping rubbish.");
-}
-
-
 void initializeMotors() {
     Serial.begin(9600);
     Serial.println("Initializing Motor Shield...");
@@ -282,6 +273,11 @@ void turnByOneSide(char direction, float degrees) {
     rightMotor->run(RELEASE);
 }
 
+void claw_turn(char direction, float degree){
+	runCar('F',230,CLAW_LENGTH+CAR_LENGTH-CAR_WIDTH/2);
+	turnByOneSide(direction,degree);
+}
+
 void forward_and_turn(char direction, float degree){
   runCar('F',230,CAR_LENGTH-CAR_WIDTH/2);
   turnByOneSide(direction,degree);
@@ -306,8 +302,49 @@ void stop_car() {
   runCar('F',0,12);
 }
 
+void pick_up_rubbish() {
+    Serial.println("Picking up rubbish.");
+}
+
 void drop_rubbish() {
-  Serial.println('dropping rubbish');
+    Serial.println("Dropping rubbish.");
+}
+
+char type_detection() {
+    return 'G';
+    // return 'R';
+}
+
+void fourToGreen() {
+    keep_straight();
+    forward_and_turn('R', 90);
+    keep_straight();
+    forward_and_turn('R', 90);
+    keep_straight();
+    forward_and_turn('R', 90);
+    runCar('F', 150, 30);  // Move forward to align for drop
+    drop_rubbish();
+    runCar('B', 150, 30 + CAR_WIDTH);
+    turnByOneSide('L', 90);  // Turn left by one side
+    keep_straight();
+}
+
+void fourToRed() {
+    keep_straight();
+    forward_and_turn('R', 90);
+    keep_straight();
+    continue_straight();   
+    keep_straight();
+    forward_and_turn('R', 90);
+    runCar('F', 150, 30);  // Move forward to align for drop
+    drop_rubbish();
+    runCar('B', 150, 30 + CAR_WIDTH);
+    turnByOneSide('R', 90);  // Turn right by one side
+    keep_straight();
+    forward_and_turn('L', 90);
+    keep_straight();
+    continue_straight();   
+    keep_straight();
 }
 
 // Define oneToGreen function
@@ -316,20 +353,7 @@ void oneToGreen() {
     forward_and_turn('R', 90);
     keep_straight();
     continue_straight();
-    keep_straight();
-    forward_and_turn('R', 90);
-    keep_straight();
-    forward_and_turn('R', 90);
-    keep_straight();
-    forward_and_turn('R', 90);
-    
-    runCar('F', 150, 30);  // Move forward to align for drop
-    drop_rubbish();
-    
-    // Move backward to clear drop zone by CAR_WIDTH / 2
-    runCar('B', 150, 30 + CAR_WIDTH / 2);
-    turnByOneSide('L', 90);  // Turn left by one side
-    keep_straight();
+    fourToGreen();
 }
 
 // Define oneToRed function
@@ -338,22 +362,178 @@ void oneToRed() {
     forward_and_turn('R', 90);
     keep_straight();
     continue_straight();
+    fourToRed();
+}
+
+void twoToG() {
     keep_straight();
-    forward_and_turn('R', 90);
-    keep_straight();
-    continue_straight();   
-    keep_straight();
-    forward_and_turn('R', 90);
-    runCar('F', 150, 30);  // Move forward to align for drop
-    drop_rubbish();
-    runCar('B', 150, 30 + CAR_WIDTH / 2);
-    turnByOneSide('R', 90);  // Turn right by one side
-    runCar('F', 250, 70);    // Continue forward
     forward_and_turn('L', 90);
-    keep_straight();
-    continue_straight();   
+    runCar('F', 150, 30);
+    drop_rubbish();
+    runCar('B', 150, 30 + CAR_WIDTH);
+    turnByOneSide('L', 90);
     keep_straight();
 }
+
+void twoToR() {
+    keep_straight();
+    continue_straight();
+    keepstraight();
+    forward_and_turn('R', 90);
+    keepstraight();
+    forward_and_turn('R', 90);
+    runCar('F', 200, 30);
+    drop_rubbish();
+    runCar('B', 200, 30 + CAR_WIDTH);
+    turnByOneSide('R', 90);
+    keepstraight();
+    forward_and_turn('L', 90);
+    keep_straight();
+    continue_straight();
+    keep_straight();
+}
+
+void threeToG() {
+    keep_straight();
+    forward_and_turn('L', 90);
+    keep_straight();
+    continue_straight();
+    keep_straight();
+    forward_and_turn('L', 90);
+    keep_straight();
+    forward_and_turn('R', 90);
+    runCar('F', 150, 30);
+    drop_rubbish();
+    runCar('B', 150, 30 + CAR_WIDTH);
+    turnByOneSide('L', 90);
+    keep_straight();
+}
+
+void threeToR() {
+    keep_straight();
+    forward_and_turn('L', 90);
+    keep_straight();
+    forward_and_turn('L', 90);
+    runCar('F', 200, 30);
+    drop_rubbish();
+    runCar('B', 200, 30 + CAR_WIDTH);
+    turnByOneSide('R', 90);
+    keep_straight();
+    forward_and_turn('L', 90);
+    keep_straight();
+    continue_straight();
+    keep_straight();
+}
+
+char rubbish_type;
+
+void route() {
+    keep_straight();
+    pick_up_rubbish();
+    rubbish_type = type_detection();
+
+    claw_turn('L', 90);
+
+    if (rubbish_type == 'G') {
+        onetog();
+    } else {
+        onetor();
+    }
+
+    pick_up_rubbish();
+    rubbish_type = type_detection();
+    claw_turn('R', 90);
+    keep_straight();
+    forward_and_turn('R', 90);
+
+    if (rubbish_type == 'G') {
+        fourtog();
+    } else {
+        fourtor();
+    }
+
+    forward_and_turn('L', 90);
+    keep_straight();
+    pick_up_rubbish();
+    rubbish_type = type_detection();
+    keep_straight();
+    forward_and_turn('L', 90);
+
+    if (rubbish_type == 'G') {
+        threetog();
+    } else {
+        threetor();
+    }
+
+    forward_and_turn('L', 90);
+    keep_straight();
+    forward_and_turn('R', 120);
+    forward_and_turn('L', 60);
+    forward_and_turn('R', 30);
+    keep_straight();
+    pick_up_rubbish();
+    rubbish_type = type_detection();
+    keep_straight();
+    forward_and_turn('R', 90);
+    keep_straight();
+    forward_and_turn('R', 90);
+
+    if (rubbish_type == 'G') {
+        twotog();
+    } else {
+        twotor();
+    }
+
+    forward_and_turn('L', 90);
+    keep_straight();
+    forward_and_turn('R', 90);
+    keep_straight();
+    forward_and_turn('R', 90);
+    keep_straight();
+    pick_up_rubbish();
+    rubbish_type = type_detection();
+    keep_straight();
+
+    if (rubbish_type == 'G') {
+        onetog();
+    } else {
+        onetor();
+    }
+
+    forward_and_turn('R', 90);
+    keep_straight();
+    forward_and_turn('L', 90);
+    keep_straight();
+    forward_and_turn('L', 90);
+    keep_straight();
+    forward_and_turn('L', 120);
+    forward_and_turn('R', 60);
+    forward_and_turn('L', 30);
+    keep_straight();
+    pick_up_rubbish();
+    rubbish_type = type_detection();
+    keep_straight();
+    forward_and_turn('R', 90);
+    keep_straight();
+    forward_and_turn('L', 90);
+    keep_straight();
+
+    if (rubbish_type == 'G') {
+        threetog();
+    } else {
+        threetor();
+    }
+
+    forward_and_turn('L', 90);
+    keep_straight();
+    forward_and_turn('R', 90);
+    keep_straight();
+    forward_and_turn('R', 90);
+    keep_straight();
+    forward_and_turn('R', 90);
+    keep_straight();
+}
+
 
 void setup() {
     // Initialize motors and Serial communication
