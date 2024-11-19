@@ -41,6 +41,12 @@ void loop() {
   // runLeftMotor('F',200,20);
   // keep_straight();
   forward_and_turn('R',90);
+  runCar('F',200,110);
+  forward_and_turn1('L',90);
+  runCar('F',200,100);
+  turn('L',90);
+  runCar('F',200,100);
+
   // keep_straight();
   // forward_and_turn('R',90);
   delay(3000);
@@ -145,6 +151,7 @@ void turn(char direction, float degrees) {
     float innerSpeed = 200.0*innerDistance/outerDistance;
     unsigned long startTime = millis();                               // Start timing for the turn
     float time = calculateRunTime(outerDistance, calculateRealSpeed(outerSpeed));  // Calculate time for turn
+    Serial.print(innerSpeed);
 
     if (direction == 'R') {
         // Right turn: Left motor moves forward, Right motor moves backward
