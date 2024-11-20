@@ -368,7 +368,7 @@ void align_right() {
 void keep_straight() {
   Serial.println("keep straight");
   //car is on path so goes straight
-  while((lightSensorIsWhite(LightSensorPin1, 0) == 0) && (lightSensorIsWhite(LightSensorPin4, 0) == 0) && (lightSensorIsWhite(LightSensorPin2, 0) == 1) && (lightSensorIsWhite(LightSensorPin3, 0) == 1)){
+  while((lightSensorIsWhite(LightSensorPin2, 0) == 1) && (lightSensorIsWhite(LightSensorPin3, 0) == 1) && (lightSensorIsWhite(LightSensorPin1, 0) == 0) && (lightSensorIsWhite(LightSensorPin4, 0) == 0)){
     
     leftMotor->run(FORWARD);
     leftMotor->setSpeed(250);
@@ -376,11 +376,12 @@ void keep_straight() {
     rightMotor->setSpeed(250);
   }
 
-  if ((lightSensorIsWhite(LightSensorPin2, 5) == 1) && (lightSensorIsWhite(LightSensorPin3, 5) == 0)){
+  if ((lightSensorIsWhite(LightSensorPin2, 5) == 1) && (lightSensorIsWhite(LightSensorPin3, 5) == 0) && (lightSensorIsWhite(LightSensorPin1, 0) == 0) && (lightSensorIsWhite(LightSensorPin4, 0) == 0)){
     align_left();
   }
-  if ((lightSensorIsWhite(LightSensorPin3, 5) == 1) && (lightSensorIsWhite(LightSensorPin2, 5) == 0)) {
+  if ((lightSensorIsWhite(LightSensorPin3, 5) == 1) && (lightSensorIsWhite(LightSensorPin2, 5) == 0) && (lightSensorIsWhite(LightSensorPin1, 0) == 0) && (lightSensorIsWhite(LightSensorPin4, 0) == 0)) {
     align_right();
   }
-
+  
 }
+
