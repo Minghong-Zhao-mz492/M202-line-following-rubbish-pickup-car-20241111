@@ -1,0 +1,242 @@
+// Libraries
+#include <Adafruit_MotorShield.h>
+#include <math.h>
+
+// Constants
+const float COMPUTER_ACTUAL_SPEED_RATIO = 14.5; 
+const float SPEED_FACTOR = 1.18; // Speed adjustment factor based on weight
+const float CAR_WIDTH = 19; // cm
+const float ROTATIONAL_RADIUS = CAR_WIDTH / 2; // Half car width
+const float CAR_LENGTH = 15.5 - 1; // cm
+const float RIGHT_LEFT_TURN_DIFFERENCE = 1;
+const float CLAW_LENGTH = 7;
+
+// Define digital ports
+const uint8_t LightSensorPin1 = 2;
+const uint8_t LightSensorPin2 = 3;
+const uint8_t LightSensorPin3 = 4;
+const uint8_t LightSensorPin4 = 5;
+const uint8_t magneticSensorPin = 6;
+
+// Define analog ports
+const uint8_t distanceSensorPin = A0;
+
+// Motor Shield and Motor objects
+Adafruit_MotorShield AFMS = Adafruit_MotorShield();
+Adafruit_DCMotor *leftMotor = AFMS.getMotor(2);  // Left motor on port M2
+Adafruit_DCMotor *rightMotor = AFMS.getMotor(1); // Right motor on port M1
+
+// Function Declarations
+void initializeMotors();
+float calculateRealSpeed(int speed);
+float calculateRunTime(float distance, float real_speed);
+void runLeftMotor(char direction, int speed, float distance);
+void runRightMotor(char direction, int speed, float distance);
+void runCar(char direction, int speed, float distance);
+void turn(char direction);
+void turnByMiddle(char direction, float degrees);
+void turnByOneSide(char direction, float degrees);
+void forward_and_turn(char direction, float degree);
+void forward_and_turn1(char direction, float degree);
+void turn_around();
+void continue_straight();
+void stop_car();
+void drop_rubbish();
+void oneToGreen();
+void oneToRed();
+void setupInputSensor(uint8_t pin);
+void setupOutputSensor(uint8_t pin);
+bool lightSensorIsWhite(uint8_t pin, uint8_t T_s);
+void align_left();
+void align_right();
+void keep_straight();
+
+// **Setup Function**
+void setup() {
+    Serial.begin(9600);
+    Serial.println("Setup...");
+    setupInputSensor(LightSensorPin1);
+    setupInputSensor(LightSensorPin2);
+    setupInputSensor(LightSensorPin3);
+    setupInputSensor(LightSensorPin4);
+    initializeMotors();
+}
+
+// **Main Loop**
+void loop() {
+    keep_straight();
+    turn('L');
+    keep_straight();
+    turn('R');
+    delay(3000); // Pause for testing
+}
+
+// **Motor Initialization**
+void initializeMotors() {
+    Serial.println("Initializing Motor Shield...");
+    if (!AFMS.begin()) {
+        Serial.println("Motor Shield not found. Check wiring.");
+        while (1);
+    }
+    Serial.println("Motor Shield initialized.");
+}
+
+// **Speed and Timing Calculations**
+float calculateRealSpeed(int speed) {
+    return speed / COMPUTER_ACTUAL_SPEED_RATIO * SPEED_FACTOR;
+}
+
+float calculateRunTime(float distance, float real_speed) {
+    if (real_speed == 0) return 1000; // Avoid divide by zero
+    return distance / real_speed;
+}
+
+// **Motor Control Functions**
+void runLeftMotor(char direction, int speed, float distance) {
+    float real_speed = calculateRealSpeed(speed);
+    float time = calculateRunTime(distance, real_speed);
+    unsigned long startTime = millis();
+
+    if (direction == 'F') leftMotor->run(FORWARD);
+    else if (direction == 'B') leftMotor->run(BACKWARD);
+    else return;
+
+    leftMotor->setSpeed(speed);
+
+    while (millis() - startTime < time * 1000) {}
+    leftMotor->run(RELEASE);
+}
+
+void runRightMotor(char direction, int speed, float distance) {
+    float real_speed = calculateRealSpeed(speed);
+    float time = calculateRunTime(distance, real_speed);
+    unsigned long startTime = millis();
+
+    if (direction == 'F') rightMotor->run(FORWARD);
+    else if (direction == 'B') rightMotor->run(BACKWARD);
+    else return;
+
+    rightMotor->setSpeed(speed);
+
+    while (millis() - startTime < time * 1000) {}
+    rightMotor->run(RELEASE);
+}
+
+void runCar(char direction, int speed, float distance) {
+    float real_speed = calculateRealSpeed(speed);
+    float time = calculateRunTime(distance, real_speed);
+    unsigned long startTime = millis();
+
+    if (direction == 'F') {
+        leftMotor->run(FORWARD);
+        rightMotor->run(FORWARD);
+    } else if (direction == 'B') {
+        leftMotor->run(BACKWARD);
+        rightMotor->run(BACKWARD);
+    } else return;
+
+    leftMotor->setSpeed(speed);
+    rightMotor->setSpeed(speed);
+
+    while (millis() - startTime < time * 1000) {}
+    leftMotor->run(RELEASE);
+    rightMotor->run(RELEASE);
+}
+
+// **Turn Functions**
+void turn(char direction) {
+    runCar('F', 200, CAR_LENGTH - ROTATIONAL_RADIUS);
+
+    if (direction == 'L') {
+        while (lightSensorIsWhite(LightSensorPin3, 5) == 0) {
+            rightMotor->setSpeed(200);
+            rightMotor->run(FORWARD);
+        }
+        rightMotor->run(RELEASE);
+    } else if (direction == 'R') {
+        while (lightSensorIsWhite(LightSensorPin2, 5) == 0) {
+            leftMotor->setSpeed(200);
+            leftMotor->run(FORWARD);
+        }
+        leftMotor->run(RELEASE);
+    }
+}
+
+// **Line Following and Alignment**
+bool lightSensorIsWhite(uint8_t pin, uint8_t T_s) {
+    bool val = (digitalRead(pin) == HIGH);
+    delay(T_s);
+    return val;
+}
+
+void align_left() {
+    while (lightSensorIsWhite(LightSensorPin3, 5) == 0) {
+        leftMotor->run(FORWARD);
+        leftMotor->setSpeed(200);
+        rightMotor->run(FORWARD);
+        rightMotor->setSpeed(130);
+    }
+    keep_straight();
+}
+
+void align_right() {
+    while (lightSensorIsWhite(LightSensorPin2, 5) == 0) {
+        leftMotor->run(FORWARD);
+        leftMotor->setSpeed(130);
+        rightMotor->run(FORWARD);
+        rightMotor->setSpeed(200);
+    }
+    keep_straight();
+}
+
+void keep_straight() {
+    while ((lightSensorIsWhite(LightSensorPin2, 0) == 1) &&
+           (lightSensorIsWhite(LightSensorPin3, 0) == 1) &&
+           (lightSensorIsWhite(LightSensorPin1, 0) == 0) &&
+           (lightSensorIsWhite(LightSensorPin4, 0) == 0)) {
+        leftMotor->run(FORWARD);
+        leftMotor->setSpeed(250);
+        rightMotor->run(FORWARD);
+        rightMotor->setSpeed(250);
+    }
+
+    if ((lightSensorIsWhite(LightSensorPin2, 5) == 1) &&
+        (lightSensorIsWhite(LightSensorPin3, 5) == 0)) align_left();
+
+    if ((lightSensorIsWhite(LightSensorPin3, 5) == 1) &&
+        (lightSensorIsWhite(LightSensorPin2, 5) == 0)) align_right();
+}
+
+// **Miscellaneous Functions**
+void continue_straight() {
+    runCar('F', 250, 10);
+}
+
+void stop_car() {
+    runCar('F', 0, 12);
+}
+
+void drop_rubbish() {
+    Serial.println("Dropping rubbish");
+}
+
+// Routes
+void oneToGreen() {
+    keep_straight();
+    forward_and_turn('R', 90);
+    runCar('F', 150, 30);
+    drop_rubbish();
+    runCar('B', 150, 30 + CAR_WIDTH / 2);
+    turnByOneSide('L', 90);
+    keep_straight();
+}
+
+void oneToRed() {
+    keep_straight();
+    forward_and_turn('R', 90);
+    runCar('F', 150, 30);
+    drop_rubbish();
+    runCar('B', 150, 30 + CAR_WIDTH / 2);
+    turnByOneSide('R', 90);
+    keep_straight();
+}
