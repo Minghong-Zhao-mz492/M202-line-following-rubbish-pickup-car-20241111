@@ -33,11 +33,12 @@ float calculateRunTime(float distance, float real_speed);
 void runLeftMotor(char direction, int speed, float distance);
 void runRightMotor(char direction, int speed, float distance);
 void runCar(char direction, int speed, float distance);
-void turn(char direction);
 void turnByMiddle(char direction, float degrees);
 void turnByOneSide(char direction, float degrees);
 void forward_and_turn(char direction, float degree);
 void forward_and_turn1(char direction, float degree);
+void turn(char direction);
+void claw_turn(char direction);
 void turn_around();
 void continue_straight();
 void stop_car();
@@ -256,7 +257,7 @@ void turn(char direction) {
     }
 }
 
-void claw_turn(char direction, float degree){
+void claw_turn(char direction){
 	runCar('F',230,CLAW_LENGTH+CAR_LENGTH-CAR_WIDTH/2);
 
     if (direction == 'L') {
