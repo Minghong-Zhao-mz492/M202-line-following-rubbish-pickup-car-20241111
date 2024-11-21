@@ -282,7 +282,7 @@ void turn1(char direction) {
     runCar('F', 200, CAR_LENGTH);
 
     if (direction == 'L') {
-      turnByMiddle('L',45);
+        turnByMiddle('L',45);
         while (!lightSensorIsWhite(LightSensorPin3, 5)) {
             leftMotor->setSpeed(200);
             rightMotor->setSpeed(200);
@@ -290,7 +290,7 @@ void turn1(char direction) {
             rightMotor->run(FORWARD);
         }
     } else if (direction == 'R') {
-	    turnByMiddle('R',45);
+	turnByMiddle('R',45);
         while (!lightSensorIsWhite(LightSensorPin2, 5)) {
             leftMotor->setSpeed(200);
             rightMotor->setSpeed(200);
