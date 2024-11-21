@@ -34,6 +34,7 @@ void runLeftMotor(char direction, int speed, float distance);
 void runRightMotor(char direction, int speed, float distance);
 void runCar(char direction, int speed, float distance);
 void turn(char direction);
+void turn1(char direction);
 void claw_turn(char direction);
 void keep_straight();
 void align_left();
