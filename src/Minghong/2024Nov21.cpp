@@ -144,8 +144,120 @@ void runCar(char direction, int speed, float distance) {
 }
 
 // **Turn Functions**
+
+// THE FOLLOWING FUNCTIONS MAY NOT BE USED BUT WORTH KEEPING THEM IN THE CODE IN CASE WE NEED THEM
+// void turnByMiddle(char direction, float degrees) {
+
+//     Serial.println("Car is turning!");
+//     // Step 2: Determine turn based on direction ('R' for right, 'L' for left)
+//     float turnDistance = 3.14 * ROTATIONAL_RADIUS * (degrees / 180.0)*1.21;  // Calculate turn distance
+//     Serial.println(turnDistance);
+//     unsigned long startTime = millis();                               // Start timing for the turn
+//     float time = calculateRunTime(turnDistance, calculateRealSpeed(200));  // Calculate time for turn
+
+//     // Set both motor speeds
+//     leftMotor->setSpeed(200);
+//     rightMotor->setSpeed(200);
+
+//     if (direction == 'R') {
+//         // Right turn: Left motor moves forward, Right motor moves backward
+//         leftMotor->run(FORWARD);
+//         rightMotor->run(BACKWARD);
+//     } else if (direction == 'L') {
+//         // Left turn: Right motor moves forward, Left motor moves backward
+//         leftMotor->run(BACKWARD);
+//         rightMotor->run(FORWARD);
+//     } else if (direction == 'B') {
+//         // Backward turn: Left motor moves forward, Right motor moves backward (for 180-degree turn)
+//         leftMotor->run(FORWARD);
+//         rightMotor->run(BACKWARD);
+//     } else {
+//         Serial.println("Invalid direction. Use 'R' for right, 'L' for left, or 'B' for backward.");
+//         return;
+//     }
+
+  
+
+//     // Run both motors for the calculated turn time
+//     while (millis() - startTime < time * 1000) {
+//         // Wait until the calculated turn time has passed
+//     }
+
+//     // Stop both motors after turning
+//     leftMotor->run(RELEASE);
+//     rightMotor->run(RELEASE);
+// }
+
+// void turnByOneSide(char direction, float degrees) {
+
+//     Serial.println("Car is turning!");
+//     // Step 2: Determine turn based on direction ('R' for right, 'L' for left)
+//     float turnDistance = 3.14 * ROTATIONAL_RADIUS * 2 * (degrees / 180.0)*1.3;  // Calculate turn distance
+//     Serial.println(turnDistance);
+//     unsigned long startTime = millis();                               // Start timing for the turn
+//     float time = calculateRunTime(turnDistance, calculateRealSpeed(200));  // Calculate time for turn
+
+
+//     if (direction == 'R') {
+//         // Right turn: Left motor moves forward, Right motor moves backward
+//         leftMotor->run(FORWARD);
+//         // rightMotor->run(BACKWARD);
+//         leftMotor->setSpeed(200-RIGHT_LEFT_TURN_DIFFERENCE);
+//         rightMotor->setSpeed(0);
+//     } else if (direction == 'L') {
+//         // Left turn: Right motor moves forward, Left motor moves backward
+//         // leftMotor->run(BACKWARD);
+//         rightMotor->run(FORWARD);
+//         leftMotor->setSpeed(0);
+//         rightMotor->setSpeed(200);
+//     } else {
+//         Serial.println("Invalid direction. Use 'R' for right, 'L' for left, or 'B' for backward.");
+//         return;
+//     }
+
+//     // Run both motors for the calculated turn time
+//     while (millis() - startTime < time * 1000) {
+//         // Wait until the calculated turn time has passed
+//     }
+
+//     // Stop both motors after turning
+//     leftMotor->run(RELEASE);
+//     rightMotor->run(RELEASE);
+// }
+
+// void forward_and_turn(char direction, float degree){
+//   runCar('F',230,CAR_LENGTH-CAR_WIDTH/2);
+//   turnByOneSide(direction,degree);
+// }
+
+// void forward_and_turn1(char direction, float degree){
+//   runCar('F',230,CAR_LENGTH);
+//   turnByMiddle(direction,degree);
+// }
+
+
+
+
 void turn(char direction) {
     runCar('F', 200, CAR_LENGTH - ROTATIONAL_RADIUS);
+
+    if (direction == 'L') {
+        while (lightSensorIsWhite(LightSensorPin3, 5) == 0) {
+            rightMotor->setSpeed(200);
+            rightMotor->run(FORWARD);
+        }
+        rightMotor->run(RELEASE);
+    } else if (direction == 'R') {
+        while (lightSensorIsWhite(LightSensorPin2, 5) == 0) {
+            leftMotor->setSpeed(200);
+            leftMotor->run(FORWARD);
+        }
+        leftMotor->run(RELEASE);
+    }
+}
+
+void claw_turn(char direction, float degree){
+	runCar('F',230,CLAW_LENGTH+CAR_LENGTH-CAR_WIDTH/2);
 
     if (direction == 'L') {
         while (lightSensorIsWhite(LightSensorPin3, 5) == 0) {
