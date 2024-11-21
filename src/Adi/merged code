@@ -166,7 +166,7 @@ int dist(){
 }
 
 int magnetic_value(){
-  int value = (analogueRead(magneticSensorPin));
+  int value = (analogRead(magneticSensorPin));
   return value;
 }
 
