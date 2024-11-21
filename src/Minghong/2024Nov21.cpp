@@ -33,24 +33,28 @@ float calculateRunTime(float distance, float real_speed);
 void runLeftMotor(char direction, int speed, float distance);
 void runRightMotor(char direction, int speed, float distance);
 void runCar(char direction, int speed, float distance);
-void turnByMiddle(char direction, float degrees);
-void turnByOneSide(char direction, float degrees);
-void forward_and_turn(char direction, float degree);
-void forward_and_turn1(char direction, float degree);
 void turn(char direction);
 void claw_turn(char direction);
-void turn_around();
-void continue_straight();
-void stop_car();
-void drop_rubbish();
-void oneToGreen();
-void oneToRed();
-void setupInputSensor(uint8_t pin);
-void setupOutputSensor(uint8_t pin);
-bool lightSensorIsWhite(uint8_t pin, uint8_t T_s);
+void keep_straight();
 void align_left();
 void align_right();
-void keep_straight();
+bool lightSensorIsWhite(uint8_t pin, uint8_t T_s);
+void stop_car();
+void continue_straight();
+void pick_up_rubbish();
+void drop_rubbish();
+char type_detection();
+
+// Route Functions
+void fourToGreen();
+void fourToRed();
+void oneToGreen();
+void oneToRed();
+void twoToG();
+void twoToR();
+void threeToG();
+void threeToR();
+void route();
 
 // **Setup Function**
 void setup() {
