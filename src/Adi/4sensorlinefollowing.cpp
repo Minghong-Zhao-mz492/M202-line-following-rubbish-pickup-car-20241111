@@ -18,6 +18,12 @@ const uint8_t LightSensorPin2 = 3;
 const uint8_t LightSensorPin3 = 4;
 const uint8_t LightSensorPin4 = 5;
 const uint8_t magneticSensorPin = 6;
+const uint8_t buttonPin = 7;
+
+#define echoPin                                            \
+    2 // attach pin D2 Arduino to pin Echo of HC-SR04
+#define trigPin                                            \
+    3 // attach pin D3 Arduino to pin Trig of HC-SR04   
 
 // Motor Shield and Motor objects
 extern Adafruit_MotorShield AFMS;
@@ -319,9 +325,46 @@ bool lightSensorIsWhite(uint8_t pin, uint8_t T_s){
 	return val;
 }
 
+bool button(){
+	//returns true if white pattern is detected underneath the light sensor
+	//returns false if black pattern is detected underneath the light sensor
+	bool val = (digitalRead(buttonPin) == HIGH);
+	return val;
+}
 
 
+int dist(){
+  digitalWrite(trigPin, LOW);
+    delayMicroseconds(2); // wait for 2 ms to avoid
+                          // collision in serial monitor
 
+    digitalWrite(
+        trigPin,
+        HIGH); // turn on the Trigger to generate pulse
+    delayMicroseconds(
+        10); // keep the trigger "ON" for 10 ms to generate
+             // pulse for 10 ms.
+
+    digitalWrite(trigPin,
+                 LOW); // Turn off the pulse trigger to stop
+                       // pulse generation
+
+    // If pulse reached the receiver echoPin
+    // become high Then pulseIn() returns the
+    // time taken by the pulse to reach the
+    // receiver
+
+    long duration = pulseIn(echoPin, HIGH);
+    int dista = duration * 0.0344 / 2; // Expression to calculate
+                                 // distance using time
+
+    //Serial.print("Distance: ");
+    //Serial.print(
+        //dist); // Print the output in serial monitor
+    //Serial.println(" cm");
+    delay(100);
+    return dista;
+}
 
 //main function
 void setup() {
@@ -331,7 +374,20 @@ void setup() {
   setupInputSensor(LightSensorPin2);
   setupInputSensor(LightSensorPin3);
   setupInputSensor(LightSensorPin4);
+	setupInputSensor(buttonPin);
   initializeMotors();
+	pinMode(trigPin,
+            OUTPUT); // Sets the trigPin as an OUTPUT
+    pinMode(echoPin, INPUT); // Sets the echoPin as an INPUT
+
+    // Serial Communication is starting with 9600 of
+    // baudrate speed
+    Serial.begin(9600);
+
+    // The text to be printed in serial monitor
+    Serial.println(
+        "Distance measurement using Arduino Uno.");
+    delay(500);
 }
 
 void loop() {
@@ -383,5 +439,52 @@ void keep_straight() {
     align_right();
   }
   
+}
+
+void grab_rubbish() {
+
+  Serial.println("go for grab");
+  while (dist() >= 500) {
+    leftMotor->run(FORWARD);
+    leftMotor->setSpeed(150);
+    rightMotor->run(FORWARD);
+    rightMotor->setSpeed(150);
+  }
+  servo1->run(FORWARD);
+  servo1->setSpeed(150);
+  delay(2000);
+  servo1->setSpeed(0);
+  
+  while (button() == LOW) {
+    servo2->run(FORWARD);
+    servo2->setSpeed(150);
+  }
+  if (button() == HIGH){
+    Serial.println("grabbed");
+    servo2->run(FORWARD);
+    servo2->setSpeed(0);
+  }
+  servo1->run(BACKWARD);
+  servo1->setSpeed(150);
+  delay(2000);
+  servo1->setSpeed(0);
+  Serial.println("lifted");
+}
+
+
+void drop_rubbish() {
+
+  servo1->run(FORWARD);
+  servo1->setSpeed(150);
+  delay(2000);
+  servo1->setSpeed(0);
+  servo2->run(BACKWARD);
+  servo2->setSpeed(150);
+  delay(2000)
+  servo2->setSpeed(0);
+  servo1->run(BACKWARD);
+  servo1->setSpeed(150);
+  delay(2000);
+  servo1->setSpeed(0);
 }
 
