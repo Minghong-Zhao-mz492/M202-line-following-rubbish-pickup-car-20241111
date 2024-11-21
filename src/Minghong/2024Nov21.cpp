@@ -19,7 +19,7 @@ const uint8_t LightSensorPin4 = 5;
 const uint8_t magneticSensorPin = 6;
 
 // Define analog ports
-const uint8_t distanceSensorPin = A0;
+const uint8_t distanceSensorPin = A0; // Analog pin for distance sensor
 
 // Motor Shield and Motor objects
 Adafruit_MotorShield AFMS = Adafruit_MotorShield();
@@ -44,6 +44,8 @@ void continue_straight();
 void pick_up_rubbish();
 void drop_rubbish();
 char type_detection();
+void setupInputSensor(uint8_t pin);
+void setupOutputSensor(uint8_t pin);
 
 // Route Functions
 void fourToGreen();
@@ -65,6 +67,7 @@ void setup() {
     setupInputSensor(LightSensorPin3);
     setupInputSensor(LightSensorPin4);
     initializeMotors();
+    detectMotor(); // Verify motor shield connection
 }
 
 // **Main Loop**
@@ -76,7 +79,15 @@ void loop() {
     delay(3000); // Pause for testing
 }
 
-// **Motor Initialization**
+// **Initialization Functions**
+void setupInputSensor(uint8_t pin) {
+    pinMode(pin, INPUT); // Configure pin as input
+}
+
+void setupOutputSensor(uint8_t pin) {
+    pinMode(pin, OUTPUT); // Configure pin as output
+}
+
 void initializeMotors() {
     Serial.println("Initializing Motor Shield...");
     if (!AFMS.begin()) {
@@ -84,6 +95,14 @@ void initializeMotors() {
         while (1);
     }
     Serial.println("Motor Shield initialized.");
+}
+
+// **Line Following Functions**
+bool lightSensorIsWhite(uint8_t pin, uint8_t T_s) {
+    // Check if the sensor detects a white pattern (HIGH)
+    bool val = (digitalRead(pin) == HIGH);
+    delay(T_s); // Optional delay for sensor stability
+    return val;
 }
 
 // **Speed and Timing Calculations**
