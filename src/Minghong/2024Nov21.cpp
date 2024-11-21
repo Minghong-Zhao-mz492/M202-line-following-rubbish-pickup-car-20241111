@@ -68,7 +68,6 @@ void setup() {
     setupInputSensor(LightSensorPin3);
     setupInputSensor(LightSensorPin4);
     initializeMotors();
-    detectMotor(); // Verify motor shield connection
 }
 
 // **Main Loop**
@@ -283,16 +282,16 @@ void turn1(char direction) {
     runCar('F', 200, CAR_LENGTH);
 
     if (direction == 'L') {
+      turnByMiddle('L',45);
         while (!lightSensorIsWhite(LightSensorPin3, 5)) {
-	    turnByMiddle('L',45);
             leftMotor->setSpeed(200);
             rightMotor->setSpeed(200);
             leftMotor->run(BACKWARD);
             rightMotor->run(FORWARD);
         }
     } else if (direction == 'R') {
-        while (!lightSensorIsWhite(LightSensorPin2, 5)) {
 	    turnByMiddle('R',45);
+        while (!lightSensorIsWhite(LightSensorPin2, 5)) {
             leftMotor->setSpeed(200);
             rightMotor->setSpeed(200);
             leftMotor->run(FORWARD);
@@ -309,25 +308,21 @@ void claw_turn(char direction){
 	runCar('F',230,CLAW_LENGTH+CAR_LENGTH-CAR_WIDTH/2);
 
     if (direction == 'L') {
+	    turnByOneSide('L',45);
+
         while (lightSensorIsWhite(LightSensorPin3, 5) == 0) {
             rightMotor->setSpeed(200);
             rightMotor->run(FORWARD);
         }
         rightMotor->run(RELEASE);
     } else if (direction == 'R') {
+      turnByOneSide('R',45);
         while (lightSensorIsWhite(LightSensorPin2, 5) == 0) {
             leftMotor->setSpeed(200);
             leftMotor->run(FORWARD);
         }
         leftMotor->run(RELEASE);
     }
-}
-
-// **Line Following and Alignment**
-bool lightSensorIsWhite(uint8_t pin, uint8_t T_s) {
-    bool val = (digitalRead(pin) == HIGH);
-    delay(T_s);
-    return val;
 }
 
 void align_left() {
@@ -499,12 +494,14 @@ void threeToR() {
     keep_straight();
 }
 
+char rubbish_type;
+
 void route() {
     keep_straight();
     pick_up_rubbish();
     rubbish_type = type_detection();
 
-    claw_turn('L', 90);
+    claw_turn('L');
 
     if (rubbish_type == 'G') {
         oneToGreen();
@@ -514,7 +511,7 @@ void route() {
 
     pick_up_rubbish();
     rubbish_type = type_detection();
-    claw_turn('R', 90);
+    claw_turn('R');
     keep_straight();
     turn('R');
 
