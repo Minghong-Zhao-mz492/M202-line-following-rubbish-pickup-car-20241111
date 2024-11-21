@@ -209,34 +209,238 @@ void keep_straight() {
 
 // **Miscellaneous Functions**
 void continue_straight() {
-    runCar('F', 250, 10);
+  runCar('F',250,10);
 }
 
 void stop_car() {
-    runCar('F', 0, 12);
+  runCar('F',0,12);
+}
+
+void pick_up_rubbish() {
+    Serial.println("Picking up rubbish.");
 }
 
 void drop_rubbish() {
-    Serial.println("Dropping rubbish");
+    Serial.println("Dropping rubbish.");
+}
+
+char type_detection() {
+    return 'G';
+    // return 'R';
 }
 
 // Routes
+void fourToGreen() {
+    keep_straight();
+    turn('R');
+    keep_straight();
+    turn('R');
+    keep_straight();
+    turn('R');
+    runCar('F', 150, 30);  // Move forward to align for drop
+    drop_rubbish();
+    runCar('B', 150, 30 + CAR_WIDTH);
+    turn('L');  // Turn left
+    keep_straight();
+}
+
+void fourToRed() {
+    keep_straight();
+    turn('R');
+    keep_straight();
+    continue_straight();   
+    keep_straight();
+    turn('R');
+    runCar('F', 150, 30);  // Move forward to align for drop
+    drop_rubbish();
+    runCar('B', 150, 30 + CAR_WIDTH);
+    turn('R');  // Turn right
+    keep_straight();
+    turn('L');
+    keep_straight();
+    continue_straight();   
+    keep_straight();
+}
+
 void oneToGreen() {
     keep_straight();
-    forward_and_turn('R', 90);
-    runCar('F', 150, 30);
-    drop_rubbish();
-    runCar('B', 150, 30 + CAR_WIDTH / 2);
-    turnByOneSide('L', 90);
+    turn('R');
     keep_straight();
+    continue_straight();
+    fourToGreen();
 }
 
 void oneToRed() {
     keep_straight();
-    forward_and_turn('R', 90);
+    turn('R');
+    keep_straight();
+    continue_straight();
+    fourToRed();
+}
+
+void twoToG() {
+    keep_straight();
+    turn('L');
     runCar('F', 150, 30);
     drop_rubbish();
-    runCar('B', 150, 30 + CAR_WIDTH / 2);
-    turnByOneSide('R', 90);
+    runCar('B', 150, 30 + CAR_WIDTH);
+    turn('L');
+    keep_straight();
+}
+
+void twoToR() {
+    keep_straight();
+    continue_straight();
+    keep_straight();
+    turn('R');
+    keep_straight();
+    turn('R');
+    runCar('F', 200, 30);
+    drop_rubbish();
+    runCar('B', 200, 30 + CAR_WIDTH);
+    turn('R');
+    keep_straight();
+    turn('L');
+    keep_straight();
+    continue_straight();
+    keep_straight();
+}
+
+void threeToG() {
+    keep_straight();
+    turn('L');
+    keep_straight();
+    continue_straight();
+    keep_straight();
+    turn('L');
+    keep_straight();
+    turn('R');
+    runCar('F', 150, 30);
+    drop_rubbish();
+    runCar('B', 150, 30 + CAR_WIDTH);
+    turn('L');
+    keep_straight();
+}
+
+void threeToR() {
+    keep_straight();
+    turn('L');
+    keep_straight();
+    turn('L');
+    runCar('F', 200, 30);
+    drop_rubbish();
+    runCar('B', 200, 30 + CAR_WIDTH);
+    turn('R');
+    keep_straight();
+    turn('L');
+    keep_straight();
+    continue_straight();
+    keep_straight();
+}
+
+void route() {
+    keep_straight();
+    pick_up_rubbish();
+    rubbish_type = type_detection();
+
+    claw_turn('L', 90);
+
+    if (rubbish_type == 'G') {
+        oneToGreen();
+    } else {
+        oneToRed();
+    }
+
+    pick_up_rubbish();
+    rubbish_type = type_detection();
+    claw_turn('R', 90);
+    keep_straight();
+    turn('R');
+
+    if (rubbish_type == 'G') {
+        fourToGreen();
+    } else {
+        fourToRed();
+    }
+
+    turn('L');
+    keep_straight();
+    pick_up_rubbish();
+    rubbish_type = type_detection();
+    keep_straight();
+    turn('L');
+
+    if (rubbish_type == 'G') {
+        threeToG();
+    } else {
+        threeToR();
+    }
+
+    turn('L');
+    keep_straight();
+    turn('R');
+    turn('L');
+    turn('R');
+    keep_straight();
+    pick_up_rubbish();
+    rubbish_type = type_detection();
+    keep_straight();
+    turn('R');
+    keep_straight();
+    turn('R');
+
+    if (rubbish_type == 'G') {
+        twoToG();
+    } else {
+        twoToR();
+    }
+
+    turn('L');
+    keep_straight();
+    turn('R');
+    keep_straight();
+    turn('R');
+    keep_straight();
+    pick_up_rubbish();
+    rubbish_type = type_detection();
+    keep_straight();
+
+    if (rubbish_type == 'G') {
+        oneToGreen();
+    } else {
+        oneToRed();
+    }
+
+    turn('R');
+    keep_straight();
+    turn('L');
+    keep_straight();
+    turn('L');
+    keep_straight();
+    turn('L');
+    turn('R');
+    turn('L');
+    keep_straight();
+    pick_up_rubbish();
+    rubbish_type = type_detection();
+    keep_straight();
+    turn('R');
+    keep_straight();
+    turn('L');
+    keep_straight();
+
+    if (rubbish_type == 'G') {
+        threeToG();
+    } else {
+        threeToR();
+    }
+
+    turn('L');
+    keep_straight();
+    turn('R');
+    keep_straight();
+    turn('R');
+    keep_straight();
+    turn('R');
     keep_straight();
 }
