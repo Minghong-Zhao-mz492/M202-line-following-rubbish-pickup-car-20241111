@@ -169,8 +169,6 @@ void runCar(char direction, int speed, float distance) {
 }
 
 // **Turn Functions**
-
-// THE FOLLOWING FUNCTIONS MAY NOT BE USED BUT WORTH KEEPING THEM IN THE CODE IN CASE WE NEED THEM
 void turnByMiddle(char direction, float degrees) {
 
     Serial.println("Car is turning!");
@@ -250,29 +248,29 @@ void turnByOneSide(char direction, float degrees) {
     rightMotor->run(RELEASE);
 }
 
-void forward_and_turn(char direction, float degree){
-  runCar('F',230,CAR_LENGTH-CAR_WIDTH/2);
-  turnByOneSide(direction,degree);
-}
+// NOT USED ANYMORE
+// void forward_and_turn(char direction, float degree){
+//   runCar('F',230,CAR_LENGTH-CAR_WIDTH/2);
+//   turnByOneSide(direction,degree);
+// }
 
-void forward_and_turn1(char direction, float degree){
-  runCar('F',230,CAR_LENGTH);
-  turnByMiddle(direction,degree);
-}
-
-
-
+// void forward_and_turn1(char direction, float degree){
+//   runCar('F',230,CAR_LENGTH);
+//   turnByMiddle(direction,degree);
+// }
 
 void turn(char direction) {
     runCar('F', 200, CAR_LENGTH - ROTATIONAL_RADIUS);
 
     if (direction == 'L') {
+	turnByOneSide('L',45);
         while (lightSensorIsWhite(LightSensorPin3, 5) == 0) {
             rightMotor->setSpeed(200);
             rightMotor->run(FORWARD);
         }
         rightMotor->run(RELEASE);
     } else if (direction == 'R') {
+	turnByOneSide('R',45);
         while (lightSensorIsWhite(LightSensorPin2, 5) == 0) {
             leftMotor->setSpeed(200);
             leftMotor->run(FORWARD);
@@ -286,6 +284,7 @@ void turn1(char direction) {
 
     if (direction == 'L') {
         while (!lightSensorIsWhite(LightSensorPin3, 5)) {
+	    turnByMiddle('L',45);
             leftMotor->setSpeed(200);
             rightMotor->setSpeed(200);
             leftMotor->run(BACKWARD);
@@ -293,6 +292,7 @@ void turn1(char direction) {
         }
     } else if (direction == 'R') {
         while (!lightSensorIsWhite(LightSensorPin2, 5)) {
+	    turnByMiddle('R',45);
             leftMotor->setSpeed(200);
             rightMotor->setSpeed(200);
             leftMotor->run(FORWARD);
@@ -301,7 +301,6 @@ void turn1(char direction) {
     } else {
         return;
     }
-
     leftMotor->run(RELEASE);
     rightMotor->run(RELEASE);
 }
