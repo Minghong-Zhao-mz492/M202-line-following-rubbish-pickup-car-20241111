@@ -21,9 +21,9 @@ const uint8_t magneticSensorPin = 6;
 const uint8_t buttonPin = 7;
 
 #define echoPin                                            \
-    2 // attach pin D2 Arduino to pin Echo of HC-SR04
+    8 // attach pin D2 Arduino to pin Echo of HC-SR04
 #define trigPin                                            \
-    3 // attach pin D3 Arduino to pin Trig of HC-SR04   
+    9 // attach pin D3 Arduino to pin Trig of HC-SR04   
 
 // Define analog ports
 const uint8_t distanceSensorPin = A0; // Analog pin for distance sensor
