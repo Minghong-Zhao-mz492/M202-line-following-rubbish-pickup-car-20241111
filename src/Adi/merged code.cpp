@@ -26,7 +26,7 @@ const uint8_t buttonPin = 7;
     9 // attach pin D3 Arduino to pin Trig of HC-SR04   
 
 // Define analog ports
-const uint8_t distanceSensorPin = A0; // Analog pin for distance sensor
+//const uint8_t distanceSensorPin = A0; // Analog pin for distance sensor
 
 Servo myservo1;  // create servo object to control a servo
 // twelve servo objects can be created on most boards
