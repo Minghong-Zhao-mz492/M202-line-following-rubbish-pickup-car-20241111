@@ -383,9 +383,9 @@ void claw_turn(char direction){
 void align_left() {
     while (lightSensorIsWhite(LightSensorPin3, 5) == 0) {
         leftMotor->run(FORWARD);
-        leftMotor->setSpeed(200);
+        leftMotor->setSpeed(130);
         rightMotor->run(FORWARD);
-        rightMotor->setSpeed(130);
+        rightMotor->setSpeed(200);
     }
     keep_straight();
 }
@@ -393,9 +393,9 @@ void align_left() {
 void align_right() {
     while (lightSensorIsWhite(LightSensorPin2, 5) == 0) {
         leftMotor->run(FORWARD);
-        leftMotor->setSpeed(130);
+        leftMotor->setSpeed(200);
         rightMotor->run(FORWARD);
-        rightMotor->setSpeed(200);
+        rightMotor->setSpeed(130);
     }
     keep_straight();
 }
