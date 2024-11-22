@@ -1,3 +1,4 @@
+// Libraries
 #include <Adafruit_MotorShield.h>
 #include <math.h>
 #include <Servo.h>
@@ -432,17 +433,17 @@ void keep_straight() {
 
     if ((lightSensorIsWhite(LightSensorPin2, 5) == 1) &&
         (lightSensorIsWhite(LightSensorPin3, 5) == 0) &&
-        (dist()>=1000)) {
+        (dist()>=100)) {
       align_left();
     }
 
     if ((lightSensorIsWhite(LightSensorPin3, 5) == 1) &&
         (lightSensorIsWhite(LightSensorPin2, 5) == 0) &&
-        (dist()>=1000)) {
+        (dist()>=100)) {
       align_right();
     }
     
-    if ((dist()<=1000)){
+    if ((dist()<=100)){
       grab_rubbish();
     }
 }
@@ -450,7 +451,7 @@ void keep_straight() {
 void grab_rubbish() {
 
   Serial.println("go for grab");
-  while (dist() >= 500) {
+  while (dist() >= 50) {
     leftMotor->run(FORWARD);
     leftMotor->setSpeed(150);
     rightMotor->run(FORWARD);
