@@ -414,7 +414,7 @@ void keep_straight() {
     while ((lightSensorIsWhite(LightSensorPin2, 0) == 1) &&
            (lightSensorIsWhite(LightSensorPin3, 0) == 1) &&
            (lightSensorIsWhite(LightSensorPin1, 0) == 0) &&
-           (lightSensorIsWhite(LightSensorPin4, 0) == 0)) {
+           (lightSensorIsWhite(LightSensorPin4, 0) == 0) && (dist()>=1000)) {
         leftMotor->run(FORWARD);
         leftMotor->setSpeed(250);
         rightMotor->run(FORWARD);
@@ -422,10 +422,20 @@ void keep_straight() {
     }
 
     if ((lightSensorIsWhite(LightSensorPin2, 5) == 1) &&
-        (lightSensorIsWhite(LightSensorPin3, 5) == 0)) align_left();
+        (lightSensorIsWhite(LightSensorPin3, 5) == 0) &&
+        (dist()>=1000)) {
+      align_left();
+    }
 
     if ((lightSensorIsWhite(LightSensorPin3, 5) == 1) &&
-        (lightSensorIsWhite(LightSensorPin2, 5) == 0)) align_right();
+        (lightSensorIsWhite(LightSensorPin2, 5) == 0) &&
+        (dist()>=1000)) {
+      align_right();
+    }
+    
+    if ((dist()<=1000)){
+      grab_rubbish();
+    }
 }
 
 void grab_rubbish() {
