@@ -421,10 +421,12 @@ void align_right() {
 }
 
 void keep_straight() {
+    Serial.println("go_straight");
     while ((lightSensorIsWhite(LightSensorPin2, 0) == 1) &&
            (lightSensorIsWhite(LightSensorPin3, 0) == 1) &&
            (lightSensorIsWhite(LightSensorPin1, 0) == 0) &&
-           (lightSensorIsWhite(LightSensorPin4, 0) == 0) && (dist()>=1000)) {
+           (lightSensorIsWhite(LightSensorPin4, 0) == 0) 
+           && (dist()>=10)) {
         leftMotor->run(FORWARD);
         leftMotor->setSpeed(250);
         rightMotor->run(FORWARD);
@@ -433,17 +435,17 @@ void keep_straight() {
 
     if ((lightSensorIsWhite(LightSensorPin2, 5) == 1) &&
         (lightSensorIsWhite(LightSensorPin3, 5) == 0) &&
-        (dist()>=100)) {
+        (dist()>=10)) {
       align_left();
     }
 
     if ((lightSensorIsWhite(LightSensorPin3, 5) == 1) &&
         (lightSensorIsWhite(LightSensorPin2, 5) == 0) &&
-        (dist()>=100)) {
+        (dist()>=10)) {
       align_right();
     }
     
-    if ((dist()<=100)){
+    if ((dist()<=10)){
       grab_rubbish();
     }
 }
@@ -451,7 +453,7 @@ void keep_straight() {
 void grab_rubbish() {
 
   Serial.println("go for grab");
-  while (dist() >= 50) {
+  while (dist() >= 5) {
     leftMotor->run(FORWARD);
     leftMotor->setSpeed(150);
     rightMotor->run(FORWARD);
