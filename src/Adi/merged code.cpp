@@ -1,6 +1,6 @@
-// Libraries
 #include <Adafruit_MotorShield.h>
 #include <math.h>
+#include <Servo.h>
 
 // Constants
 const float COMPUTER_ACTUAL_SPEED_RATIO = 14.5; 
@@ -26,6 +26,13 @@ const uint8_t buttonPin = 7;
 
 // Define analog ports
 const uint8_t distanceSensorPin = A0; // Analog pin for distance sensor
+
+Servo myservo1;  // create servo object to control a servo
+// twelve servo objects can be created on most boards
+Servo myservo2;
+
+int pos = 0;    // variable to store the servo position
+
 
 // Motor Shield and Motor objects
 Adafruit_MotorShield AFMS = Adafruit_MotorShield();
@@ -87,6 +94,8 @@ void setup() {
     Serial.println(
         "Distance measurement using Arduino Uno.");
     delay(500);
+    myservo1.attach(8);
+    myservo2.attach(9);
 }
 
 // **Main Loop**
@@ -447,41 +456,53 @@ void grab_rubbish() {
     rightMotor->run(FORWARD);
     rightMotor->setSpeed(150);
   }
-  servo1->run(FORWARD);
-  servo1->setSpeed(150);
-  delay(2000);
-  servo1->setSpeed(0);
+  myservo1.write(0);
+  //servo1->run(FORWARD);
+  //servo1->setSpeed(150);
+  //delay(2000);
+  //servo1->setSpeed(0);
   
   while (button() == LOW) {
-    servo2->run(FORWARD);
-    servo2->setSpeed(150);
+    //servo2->run(FORWARD);
+    //servo2->setSpeed(150);
+    for (pos = 0; pos <= 180; pos += 1) { // goes from 0 degrees to 180 degrees
+    // in steps of 1 degree
+    myservo2.write(pos);              // tell servo to go to position in variable 'pos'
+    delay(15);                       // waits 15ms for the servo to reach the position
   }
-  if (button() == HIGH){
-    Serial.println("grabbed");
-    servo2->run(FORWARD);
-    servo2->setSpeed(0);
   }
-  servo1->run(BACKWARD);
-  servo1->setSpeed(150);
-  delay(2000);
-  servo1->setSpeed(0);
+  //if (button() == HIGH){
+    //Serial.println("grabbed");
+    //servo2->run(FORWARD);
+    //servo2->setSpeed(0);
+  //}
+  //servo1->run(BACKWARD);
+  //servo1->setSpeed(150);
+  //delay(2000);
+  //servo1->setSpeed(0);
+  myservo1.write(90);
+
   Serial.println("lifted");
 }
 
 void drop_rubbish() {
+  myservo1.write(0);
 
-  servo1->run(FORWARD);
-  servo1->setSpeed(150);
-  delay(2000);
-  servo1->setSpeed(0);
-  servo2->run(BACKWARD);
-  servo2->setSpeed(150);
-  delay(2000)
-  servo2->setSpeed(0);
-  servo1->run(BACKWARD);
-  servo1->setSpeed(150);
-  delay(2000);
-  servo1->setSpeed(0);
+  //servo1->run(FORWARD);
+  //servo1->setSpeed(150);
+  //delay(2000);
+  //servo1->setSpeed(0);
+  //servo2->run(BACKWARD);
+  //servo2->setSpeed(150);
+  //delay(2000)
+  //servo2->setSpeed(0);
+  myservo2.write(0);
+
+  //servo1->run(BACKWARD);
+  //servo1->setSpeed(150);
+  //delay(2000);
+  //servo1->setSpeed(0);
+  myservo1.write(90);
 }
 
 // **Miscellaneous Functions**
@@ -497,9 +518,9 @@ void pick_up_rubbish() {
     Serial.println("Picking up rubbish.");
 }
 
-void drop_rubbish() {
-    Serial.println("Dropping rubbish.");
-}
+//void drop_rubbish() {
+//    Serial.println("Dropping rubbish.");
+//}
 
 char type_detection() {
     return 'G';
