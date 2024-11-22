@@ -305,7 +305,7 @@ void turn1(char direction) {
 }
 
 void claw_turn(char direction){
-	runCar('F',230,CLAW_LENGTH+CAR_LENGTH-CAR_WIDTH/2);
+	runCar('F',200,CLAW_LENGTH+CAR_LENGTH-CAR_WIDTH/2);
 
     if (direction == 'L') {
 	    turnByOneSide('L',45);
