@@ -421,7 +421,7 @@ void align_right() {
 }
 
 void keep_straight() {
-    Serial.println("go_straight");
+    Serial.println("keep_straight");
     while ((lightSensorIsWhite(LightSensorPin2, 0) == 1) &&
            (lightSensorIsWhite(LightSensorPin3, 0) == 1) &&
            (lightSensorIsWhite(LightSensorPin1, 0) == 0) &&
