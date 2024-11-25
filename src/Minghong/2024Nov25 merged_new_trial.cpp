@@ -1,6 +1,3 @@
-// I mainly changed the code at keeo straight.
-
-
 // Libraries
 #include <Adafruit_MotorShield.h>
 #include <math.h>
