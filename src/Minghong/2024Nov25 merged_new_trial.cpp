@@ -1,3 +1,6 @@
+// I mainly changed the code at keeo straight.
+
+
 // Libraries
 #include <Adafruit_MotorShield.h>
 #include <math.h>
@@ -402,7 +405,7 @@ void align_right() {
 
 void keep_straight() {
     while ((lightSensorIsWhite(LightSensorPin1, 0) == 0) &&
-           (lightSensorIsWhite(LightSensorPin4, 0) == 0)) {
+           (lightSensorIsWhite(LightSensorPin4, 0) == 0) && (dist()>=10)) {
 	if((lightSensorIsWhite(LightSensorPin2, 0) == 1) &&
            (lightSensorIsWhite(LightSensorPin3, 0) == 1)) {
         leftMotor->run(FORWARD);
@@ -419,7 +422,38 @@ void keep_straight() {
     }
     leftMotor->run(RELEASE);
     rightMotor->run(RELEASE);
+    grab_rubbish();
 }
+
+// void keep_straight() {
+//     Serial.println("go_straight");
+//     while ((lightSensorIsWhite(LightSensorPin2, 0) == 1) &&
+//            (lightSensorIsWhite(LightSensorPin3, 0) == 1) &&
+//            (lightSensorIsWhite(LightSensorPin1, 0) == 0) &&
+//            (lightSensorIsWhite(LightSensorPin4, 0) == 0) 
+//            && (dist()>=10)) {
+//         leftMotor->run(FORWARD);
+//         leftMotor->setSpeed(250);
+//         rightMotor->run(FORWARD);
+//         rightMotor->setSpeed(250);
+//     }
+
+//     if ((lightSensorIsWhite(LightSensorPin2, 5) == 1) &&
+//         (lightSensorIsWhite(LightSensorPin3, 5) == 0) &&
+//         (dist()>=10)) {
+//       align_left();
+//     }
+
+//     if ((lightSensorIsWhite(LightSensorPin3, 5) == 1) &&
+//         (lightSensorIsWhite(LightSensorPin2, 5) == 0) &&
+//         (dist()>=10)) {
+//       align_right();
+//     }
+    
+//     if ((dist()<=10)){
+//       grab_rubbish();
+//     }
+// }
 
 // **Miscellaneous Functions**
 void continue_straight() {
