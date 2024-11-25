@@ -401,21 +401,21 @@ void align_right() {
 }
 
 void keep_straight() {
-    while ((lightSensorIsWhite(LightSensorPin2, 0) == 1) &&
-           (lightSensorIsWhite(LightSensorPin3, 0) == 1) &&
-           (lightSensorIsWhite(LightSensorPin1, 0) == 0) &&
+    while ((lightSensorIsWhite(LightSensorPin1, 0) == 0) &&
            (lightSensorIsWhite(LightSensorPin4, 0) == 0)) {
+	if((lightSensorIsWhite(LightSensorPin2, 0) == 1) &&
+           (lightSensorIsWhite(LightSensorPin3, 0) == 1)) {
         leftMotor->run(FORWARD);
         leftMotor->setSpeed(250);
         rightMotor->run(FORWARD);
         rightMotor->setSpeed(250);
-    
+	}
 
-    if ((lightSensorIsWhite(LightSensorPin2, 5) == 1) &&
-        (lightSensorIsWhite(LightSensorPin3, 5) == 0)) align_left();
+    	if ((lightSensorIsWhite(LightSensorPin2, 5) == 1) &&
+            (lightSensorIsWhite(LightSensorPin3, 5) == 0)) align_left();
 
-    if ((lightSensorIsWhite(LightSensorPin3, 5) == 1) &&
-        (lightSensorIsWhite(LightSensorPin2, 5) == 0)) align_right();
+    	if ((lightSensorIsWhite(LightSensorPin3, 5) == 1) &&
+            (lightSensorIsWhite(LightSensorPin2, 5) == 0)) align_right();
     }
     leftMotor->run(RELEASE);
     rightMotor->run(RELEASE);
