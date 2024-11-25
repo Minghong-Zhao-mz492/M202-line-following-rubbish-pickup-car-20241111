@@ -120,7 +120,6 @@ void setup() {
 // **Main Loop**
 void loop() {
     keep_straight();
-    delay(3000);
     turn('L');
     keep_straight();
     turn('R');
