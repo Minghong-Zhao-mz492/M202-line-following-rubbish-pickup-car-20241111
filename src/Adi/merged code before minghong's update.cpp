@@ -435,12 +435,16 @@ void keep_straight() {
 
     if ((lightSensorIsWhite(LightSensorPin2, 5) == 1) &&
         (lightSensorIsWhite(LightSensorPin3, 5) == 0) &&
+        (lightSensorIsWhite(LightSensorPin1, 0) == 0) &&
+        (lightSensorIsWhite(LightSensorPin4, 0) == 0) &&
         (dist()>=10)) {
       align_left();
     }
 
     if ((lightSensorIsWhite(LightSensorPin3, 5) == 1) &&
         (lightSensorIsWhite(LightSensorPin2, 5) == 0) &&
+        (lightSensorIsWhite(LightSensorPin1, 0) == 0) &&
+        (lightSensorIsWhite(LightSensorPin4, 0) == 0) &&
         (dist()>=10)) {
       align_right();
     }
@@ -468,14 +472,15 @@ void grab_rubbish() {
   while (button() == LOW) {
     //servo2->run(FORWARD);
     //servo2->setSpeed(150);
-    for (pos = 0; pos <= 180; pos += 1) { // goes from 0 degrees to 180 degrees
+    for (pos = 0; pos <= 50; pos += 1) { // goes from 0 degrees to 180 degrees
     // in steps of 1 degree
     myservo2.write(pos);              // tell servo to go to position in variable 'pos'
-    delay(15);                       // waits 15ms for the servo to reach the position
+    break;                       // waits 15ms for the servo to reach the position
   }
   }
-  //if (button() == HIGH){
-    //Serial.println("grabbed");
+  if (button() == HIGH){
+    Serial.println("grabbed");
+  }
     //servo2->run(FORWARD);
     //servo2->setSpeed(0);
   //}
@@ -483,7 +488,7 @@ void grab_rubbish() {
   //servo1->setSpeed(150);
   //delay(2000);
   //servo1->setSpeed(0);
-  myservo1.write(90);
+  myservo1.write(50);
 
   Serial.println("lifted");
 }
@@ -505,7 +510,7 @@ void drop_rubbish() {
   //servo1->setSpeed(150);
   //delay(2000);
   //servo1->setSpeed(0);
-  myservo1.write(90);
+  myservo1.write(50);
 }
 
 // **Miscellaneous Functions**
