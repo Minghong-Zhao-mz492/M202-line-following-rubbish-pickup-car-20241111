@@ -795,4 +795,5 @@ void route() {
     keep_straight();
     forward_and_turn('R',90);
     runCar('B',200,30);
+    turnByMiddle('L',180);
 }
