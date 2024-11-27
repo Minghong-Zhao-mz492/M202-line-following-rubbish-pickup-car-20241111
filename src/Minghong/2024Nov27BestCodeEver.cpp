@@ -796,7 +796,7 @@ void route() {
     keep_straight();
     turn('R');
     keep_straight();
-    turn('L',90);
+    turn('L');
     keep_straight();
     runCar('F',200,2*CAR_LENGTH);
 }
