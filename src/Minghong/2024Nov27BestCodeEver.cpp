@@ -19,6 +19,9 @@ const uint8_t LightSensorPin3 = 4;
 const uint8_t LightSensorPin4 = 5;
 const uint8_t magneticSensorPin = 6;
 const uint8_t buttonPin = 7;
+const uint8_t blue_led = 12;
+const uint8_t green_led = 1;
+const uint8_t red_led = 2;
 
 #define echoPin                                            \
     8 // attach pin D2 Arduino to pin Echo of HC-SR04
@@ -77,6 +80,9 @@ void route();
 void setup() {
     Serial.begin(9600);
     Serial.println("Setup...");
+    setupOutputSensor(blue_led);
+    setupOutputSensor(green_led);
+    setupOutputSensor(red_led);
     setupInputSensor(LightSensorPin1);
     setupInputSensor(LightSensorPin2);
     setupInputSensor(LightSensorPin3);
@@ -95,8 +101,8 @@ void setup() {
     Serial.println(
         "Distance measurement using Arduino Uno.");
     delay(500);
-    myservo1.attach(8);
-    myservo2.attach(9);
+    myservo1.attach(10);
+    myservo2.attach(11);
 }
 
 // **Main Loop**
@@ -522,14 +528,19 @@ void grab_rubbish() {
   while (button() == LOW) {
     //servo2->run(FORWARD);
     //servo2->setSpeed(150);
-    for (pos = 0; pos <= 180; pos += 1) { // goes from 0 degrees to 180 degrees
+    for (pos = 0; pos <= 20; pos += 1) { // goes from 0 degrees to 180 degrees
     // in steps of 1 degree
     myservo2.write(pos);              // tell servo to go to position in variable 'pos'
     delay(15);                       // waits 15ms for the servo to reach the position
   }
   }
-  //if (button() == HIGH){
-    //Serial.println("grabbed");
+  if (button() == HIGH){
+    Serial.println("grabbed");
+    digitalWrite(blue_led,HIGH);
+    delay(1000);
+    digitalWrite(blue_led,LOW);
+  }
+
     //servo2->run(FORWARD);
     //servo2->setSpeed(0);
   //}
@@ -538,8 +549,20 @@ void grab_rubbish() {
   //delay(2000);
   //servo1->setSpeed(0);
   myservo1.write(90);
+  delay(2000);
+  if(magnetic_value()>=20){
+    digitalWrite(green_led,HIGH);
+    delay(1000);
+    digitalWrite(green_led,LOW);
+  }
+  else{
+    digitalWrite(red_led,HIGH);
+    delay(1000);
+    digitalWrite(red_led,LOW);
+  }
 
   Serial.println("lifted");
+  keep_straight();
 }
 
 void drop_rubbish() {
@@ -799,4 +822,5 @@ void route() {
     turn('L');
     keep_straight();
     runCar('F',200,2*CAR_LENGTH);
+    turnByMiddle('L',180);
 }
