@@ -5,7 +5,7 @@
 
 // Constants
 const float COMPUTER_ACTUAL_SPEED_RATIO = 14.5; 
-const float SPEED_FACTOR = 1.18; // Speed adjustment factor based on weight
+const float SPEED_FACTOR = 1; // Speed adjustment factor based on weight
 const float CAR_WIDTH = 19; // cm
 const float ROTATIONAL_RADIUS = CAR_WIDTH / 2; // Half car width
 const float CAR_LENGTH = 15.5 - 1; // cm
@@ -253,8 +253,8 @@ void runCar(char direction, int speed, float distance) {
         rightMotor->run(BACKWARD);
     } else return;
 
-    leftMotor->setSpeed(speed);
-    rightMotor->setSpeed(speed);
+    leftMotor->setSpeed(speed-10);
+    rightMotor->setSpeed(speed+10);
 
     while (millis() - startTime < time * 1000) {}
     leftMotor->run(RELEASE);
