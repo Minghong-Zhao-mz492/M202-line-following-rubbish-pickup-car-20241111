@@ -19,10 +19,10 @@ const uint8_t LightSensorPin3 = 4;
 const uint8_t LightSensorPin4 = 5;
 const uint8_t magneticSensorPin = 6;
 const uint8_t buttonPin = 7;
-const uint8_t blue_led = A5;
-const uint8_t green_led = A0;
-const uint8_t red_led = A1;
-const uint8_t on_switch = 1;
+const uint8_t blue_led = 8;
+const uint8_t green_led = 9;
+const uint8_t red_led = 10;
+const uint8_t on_switch = 0;
 
 
 /*
@@ -114,8 +114,8 @@ void setup() {
     Serial.println(
         "Distance measurement using Arduino Uno.");
     delay(500);
-    myservo1.attach(10);
-    myservo2.attach(11);
+    myservo1.attach(11);
+    myservo2.attach(12);
 }
 
 // **Main Loop**
@@ -136,13 +136,23 @@ void loop() {
     // forward_and_turn('R',90);
     // runCar('F',200,4);
     // keep_straight();
-    //while(digitalRead(on_switch)==LOW){
-      //delay(10000);
-    //}
-    //Serial.println(dist());
-    myservo1.write(-90);
+    
+     while(digitalRead(on_switch)==HIGH){
+      
+       digitalWrite(blue_led,HIGH);
+       delay(1000);
+       digitalWrite(blue_led,LOW);
+       delay(1000);
+     }
+     //while(digitalRead(button == LOW) && (digitalRead(on_switch)==LOW)){
+      myservo2.write(0);
+     //}
+    Serial.println(dist());
+    
+    
+    //myservo1.write(-90);
     //route();
-    //delay(3000); // Pause for testing
+     // Pause for testing
 }
 
 // **Initialization Functions**
