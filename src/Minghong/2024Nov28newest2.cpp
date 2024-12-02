@@ -13,20 +13,32 @@ const float RIGHT_LEFT_TURN_DIFFERENCE = 1;
 const float CLAW_LENGTH = 7;
 
 // Define digital ports
-const uint8_t LightSensorPin1 = 2;
+const uint8_t LightSensorPin1 = 6;
 const uint8_t LightSensorPin2 = 3;
 const uint8_t LightSensorPin3 = 4;
 const uint8_t LightSensorPin4 = 5;
-const uint8_t magneticSensorPin = 6;
-const uint8_t buttonPin = 7;
-const uint8_t blue_led = 12;
-const uint8_t green_led = 1;
-const uint8_t red_led = 13;
+const uint8_t magneticSensorPin = A4;
+const uint8_t magneticSensorPin2 = A1;
+// const uint8_t buttonPin = A2;
+const uint8_t blue_led = 8;
+const uint8_t green_led = 9;
+const uint8_t red_led = 10;
+const uint8_t on_switch = 7;
 
-#define echoPin                                            \
-    8 // attach pin D8 Arduino to pin Echo of HC-SR04
-#define trigPin                                            \
-    9 // attach pin D9 Arduino to pin Trig of HC-SR04   
+
+/*
+IDP
+David Paterson
+URM09 Ultrasonic Sensor test
+*/
+#define MAX_RANG (520)//the max measurement value of the module is 520cm(a little bit longer
+//than effective max range)
+#define ADC_SOLUTION (1023.0)//ADC accuracy of Arduino UNO is 10bit
+int sensityPin = A0; // select the input pin
+//#define echoPin                                            \
+    8 // attach pin D2 Arduino to pin Echo of HC-SR04
+//#define trigPin                                            \
+    9 // attach pin D3 Arduino to pin Trig of HC-SR04   
 
 // Define analog ports
 //const uint8_t distanceSensorPin = A0; // Analog pin for distance sensor
@@ -87,24 +99,27 @@ void setup() {
     setupInputSensor(LightSensorPin2);
     setupInputSensor(LightSensorPin3);
     setupInputSensor(LightSensorPin4);
-    setupInputSensor(buttonPin);
+  
+
+    setupInputSensor(on_switch);
+    setupInputSensor(sensityPin);
     initializeMotors();
-    pinMode(trigPin,
-            OUTPUT); // Sets the trigPin as an OUTPUT
-    pinMode(echoPin, INPUT); // Sets the echoPin as an INPUT
+    //pinMode(trigPin,
+            //OUTPUT); // Sets the trigPin as an OUTPUT
+    //pinMode(echoPin, INPUT); // Sets the echoPin as an INPUT
 
     // Serial Communication is starting with 9600 of
     // baudrate speed
-    Serial.begin(9600);
 
     // The text to be printed in serial monitor
     Serial.println(
         "Distance measurement using Arduino Uno.");
     delay(500);
-    myservo1.attach(10);
-    myservo2.attach(11);
+    myservo1.attach(11);
+    myservo2.attach(12);
 }
-
+int pos1 = 90;
+int pos2;
 // **Main Loop**
 void loop() {
 
@@ -121,10 +136,49 @@ void loop() {
     // turn('R');
     // keep_straight();
     // forward_and_turn('R',90);
-    // runCar('F',200,4);
+    // runCar('F',200,40);
+    // runCar('B',200,40);
+
     // keep_straight();
+    
+     while(digitalRead(on_switch)==HIGH){
+      
+       digitalWrite(blue_led,HIGH);
+       delay(1000);
+       digitalWrite(blue_led,LOW);
+       delay(1000);
+       myservo1.write(90);//170 up 90 down
+       myservo2.write(90);
+       //70 open, 110 closed
+     }
+    myservo1.write(170);//170 up 90 down
+    myservo2.write(70);
+    delay(1000);
+
+     //myservo1.write(170);
+     //while(digitalRead(button == LOW) && (digitalRead(on_switch)==LOW)){
+      //myservo2.write(70);
+      //while (pos1>=90) {
+        //for (pos1 = 170; pos1 >= 90; pos1 -= 1) { // goes from 0 degrees to 180 degrees
+          //myservo1.write(pos1);              // tell servo to go to position in variable 'pos'
+          //delay(15);                       // waits 15ms for the servo to reach the position
+        //}
+      //}
+      //while (pos2<=100) {
+        //for (pos2 = 70; pos2 <= 100; pos2 += 1) { // goes from 0 degrees to 180 degrees
+          //myservo2.write(pos2);              // tell servo to go to position in variable 'pos'
+          //delay(15);                       // waits 15ms for the servo to reach the position
+        //}
+      //}
+     //}
+     //grab_rubbish();
+     //delay(10000);
+    //Serial.println(dist());
+    
+    Serial.println(magnetic_value());
+    //myservo1.write(-90);
     route();
-    delay(3000); // Pause for testing
+     // Pause for testing
 }
 
 // **Initialization Functions**
@@ -153,28 +207,23 @@ bool lightSensorIsWhite(uint8_t pin, uint8_t T_s) {
     return val;
 }
 
-bool button(){
-	//returns true if white pattern is detected underneath the light sensor
-	//returns false if black pattern is detected underneath the light sensor
-	bool val = (digitalRead(buttonPin) == HIGH);
-	return val;
-}
 
+float dist_t, sensity_t;
 
 int dist(){
-  digitalWrite(trigPin, LOW);
-    delayMicroseconds(2); // wait for 2 ms to avoid
+  //digitalWrite(trigPin, LOW);
+    //delayMicroseconds(2); // wait for 2 ms to avoid
                           // collision in serial monitor
 
-    digitalWrite(
-        trigPin,
-        HIGH); // turn on the Trigger to generate pulse
-    delayMicroseconds(
-        10); // keep the trigger "ON" for 10 ms to generate
+    //digitalWrite(
+        //trigPin,
+       // HIGH); // turn on the Trigger to generate pulse
+    //delayMicroseconds(
+       // 10); // keep the trigger "ON" for 10 ms to generate
              // pulse for 10 ms.
 
-    digitalWrite(trigPin,
-                 LOW); // Turn off the pulse trigger to stop
+    //digitalWrite(trigPin,
+                 //LOW); // Turn off the pulse trigger to stop
                        // pulse generation
 
     // If pulse reached the receiver echoPin
@@ -182,20 +231,24 @@ int dist(){
     // time taken by the pulse to reach the
     // receiver
 
-    long duration = pulseIn(echoPin, HIGH);
-    int dista = duration * 0.0344 / 2; // Expression to calculate
+    //long duration = pulseIn(echoPin, HIGH);
+    //int dista = duration * 0.0344 / 2; // Expression to calculate
                                  // distance using time
 
     //Serial.print("Distance: ");
     //Serial.print(
         //dist); // Print the output in serial monitor
     //Serial.println(" cm");
-    delay(100);
-    return dista;
+    //delay(100);
+    //return dista;
+    sensity_t = analogRead(sensityPin);
+// turn the ledPin on
+    dist_t = sensity_t * MAX_RANG / ADC_SOLUTION;//
+    return dist_t;
 }
 
 int magnetic_value(){
-  int value = (analogRead(magneticSensorPin));
+  int value = (analogRead(magneticSensorPin) +analogRead(magneticSensorPin2));
   return value;
 }
 
@@ -207,6 +260,27 @@ float calculateRealSpeed(int speed) {
 float calculateRunTime(float distance, float real_speed) {
     if (real_speed == 0) return 1000; // Avoid divide by zero
     return distance / real_speed;
+}
+
+void runCar(char direction, int speed, float distance) {
+    float real_speed = calculateRealSpeed(speed);
+    float time = calculateRunTime(distance, real_speed);
+    unsigned long startTime = millis();
+
+    if (direction == 'F') {
+        leftMotor->run(FORWARD);
+        rightMotor->run(FORWARD);
+    } else if (direction == 'B') {
+        leftMotor->run(BACKWARD);
+        rightMotor->run(BACKWARD);
+    } else return;
+
+    leftMotor->setSpeed(speed-5);
+    rightMotor->setSpeed(speed+10);
+
+    while (millis() - startTime < time * 1000) {}
+    leftMotor->run(RELEASE);
+    rightMotor->run(RELEASE);
 }
 
 // **Motor Control Functions**
@@ -237,27 +311,6 @@ void runRightMotor(char direction, int speed, float distance) {
     rightMotor->setSpeed(speed);
 
     while (millis() - startTime < time * 1000) {}
-    rightMotor->run(RELEASE);
-}
-
-void runCar(char direction, int speed, float distance) {
-    float real_speed = calculateRealSpeed(speed);
-    float time = calculateRunTime(distance, real_speed);
-    unsigned long startTime = millis();
-
-    if (direction == 'F') {
-        leftMotor->run(FORWARD);
-        rightMotor->run(FORWARD);
-    } else if (direction == 'B') {
-        leftMotor->run(BACKWARD);
-        rightMotor->run(BACKWARD);
-    } else return;
-
-    leftMotor->setSpeed(speed-10);
-    rightMotor->setSpeed(speed+10);
-
-    while (millis() - startTime < time * 1000) {}
-    leftMotor->run(RELEASE);
     rightMotor->run(RELEASE);
 }
 
@@ -466,80 +519,103 @@ void keep_straight() {
     while ((lightSensorIsWhite(LightSensorPin2, 0) == 1) &&
            (lightSensorIsWhite(LightSensorPin3, 0) == 1) &&
            (lightSensorIsWhite(LightSensorPin1, 0) == 0) &&
-           (lightSensorIsWhite(LightSensorPin4, 0) == 0))
-           //&& (dist()>=10)) 
-           {
+           (lightSensorIsWhite(LightSensorPin4, 0) == 0)
+           && (dist()>=7) 
+           ){
         leftMotor->run(FORWARD);
         leftMotor->setSpeed(250);
         rightMotor->run(FORWARD);
         rightMotor->setSpeed(250);
-        Serial.println("keep_straight");
+        //Serial.println("keep_straight");
 
     }
 
     if ((lightSensorIsWhite(LightSensorPin2, 0) == 1) &&
         (lightSensorIsWhite(LightSensorPin3, 0) == 0) &&
         (lightSensorIsWhite(LightSensorPin1, 0) == 0) &&
-        (lightSensorIsWhite(LightSensorPin4, 0) == 0)) 
-        //&& (dist()>=10)) 
-        {
+        (lightSensorIsWhite(LightSensorPin4, 0) == 0)
+        && (dist()>=7) 
+        ){
       align_left();
     }
 
     if ((lightSensorIsWhite(LightSensorPin3, 0) == 1) &&
         (lightSensorIsWhite(LightSensorPin2, 0) == 0) &&
         (lightSensorIsWhite(LightSensorPin1, 0) == 0) &&
-           (lightSensorIsWhite(LightSensorPin4, 0) == 0) )
-        // &&(dist()>=10)) 
-        {
+           (lightSensorIsWhite(LightSensorPin4, 0) == 0)
+         &&(dist()>=7) 
+    ){
       align_right();
     }
     if ((lightSensorIsWhite(LightSensorPin3, 0) == 0) &&
         (lightSensorIsWhite(LightSensorPin2, 0) == 0) &&
         (lightSensorIsWhite(LightSensorPin1, 0) == 0) &&
-           (lightSensorIsWhite(LightSensorPin4, 0) == 0) )
-        // &&(dist()>=10)) 
-        {
+           (lightSensorIsWhite(LightSensorPin4, 0) == 0) 
+         &&(dist()>=10)
+    ){
       keep_straight();
     }
     
-    //if ((dist()<=10)){
-      //grab_rubbish();
-    //}
-    // leftMotor->run(RELEASE);
-    // rightMotor->run(RELEASE);
+    if ((dist()<=7)){
+      grab_rubbish();
+    }
+      //leftMotor->run(RELEASE);
+     //rightMotor->run(RELEASE);
 }
 
+char rubbish_type;
 void grab_rubbish() {
 
   Serial.println("go for grab");
-  while (dist() >= 5) {
+  while (dist() >= 7) {
     leftMotor->run(FORWARD);
     leftMotor->setSpeed(150);
     rightMotor->run(FORWARD);
     rightMotor->setSpeed(150);
   }
-  myservo1.write(0);
+  leftMotor->run(FORWARD);
+  leftMotor->setSpeed(0);
+  rightMotor->run(FORWARD);
+  rightMotor->setSpeed(0);
+  while (pos1>=90) {
+        for (pos1 = 170; pos1 >= 90; pos1 -= 1) { // goes from 0 degrees to 180 degrees
+          myservo1.write(pos1);              // tell servo to go to position in variable 'pos'
+          delay(50);                       // waits 15ms for the servo to reach the position
+        }
+      }
+  while (pos2<=109) {
+      for (pos2 = 70; pos2 <= 110; pos2 += 1) { // goes from 0 degrees to 180 degrees
+        myservo2.write(pos2);              // tell servo to go to position in variable 'pos'
+        delay(50);                       // waits 15ms for the servo to reach the position        }
+      }
+  }
+  while (pos1<=169) {
+        for (pos1 = 90; pos1 <= 170; pos1 += 1) { // goes from 0 degrees to 180 degrees
+          myservo1.write(pos1);              // tell servo to go to position in variable 'pos'
+          delay(50);                       // waits 15ms for the servo to reach the position
+        }
+      }
+  //myservo1.write(0);
   //servo1->run(FORWARD);
   //servo1->setSpeed(150);
   //delay(2000);
   //servo1->setSpeed(0);
   
-  while (button() == LOW) {
+  //while (button() == LOW) {
     //servo2->run(FORWARD);
     //servo2->setSpeed(150);
-    for (pos = 0; pos <= 20; pos += 1) { // goes from 0 degrees to 180 degrees
+    //for (pos = 0; pos <= 20; pos += 1) { // goes from 0 degrees to 180 degrees
     // in steps of 1 degree
-    myservo2.write(pos);              // tell servo to go to position in variable 'pos'
-    delay(15);                       // waits 15ms for the servo to reach the position
-  }
-  }
-  if (button() == HIGH){
+    //myservo2.write(pos);              // tell servo to go to position in variable 'pos'
+    //delay(15);                       // waits 15ms for the servo to reach the position
+  //}
+ // }
+  //if (button() == HIGH){
     Serial.println("grabbed");
     digitalWrite(blue_led,HIGH);
-    delay(1000);
-    digitalWrite(blue_led,LOW);
-  }
+    //delay(1000);
+    //digitalWrite(blue_led,LOW);
+  //}
 
     //servo2->run(FORWARD);
     //servo2->setSpeed(0);
@@ -548,25 +624,30 @@ void grab_rubbish() {
   //servo1->setSpeed(150);
   //delay(2000);
   //servo1->setSpeed(0);
-  myservo1.write(90);
+  //myservo1.write(90);
   delay(2000);
-  if(magnetic_value()>=20){
+  if(magnetic_value()>=600){
     digitalWrite(green_led,HIGH);
     delay(1000);
     digitalWrite(green_led,LOW);
+    rubbish_type='G';
   }
   else{
     digitalWrite(red_led,HIGH);
     delay(1000);
     digitalWrite(red_led,LOW);
+    rubbish_type='R';
+
   }
 
   Serial.println("lifted");
+  delay(1000);
   keep_straight();
 }
 
 void drop_rubbish() {
-  myservo1.write(0);
+  digitalWrite(blue_led,LOW);
+  myservo1.write(90);
 
   //servo1->run(FORWARD);
   //servo1->setSpeed(150);
@@ -576,13 +657,17 @@ void drop_rubbish() {
   //servo2->setSpeed(150);
   //delay(2000)
   //servo2->setSpeed(0);
-  myservo2.write(0);
+  myservo2.write(110);
 
   //servo1->run(BACKWARD);
   //servo1->setSpeed(150);
   //delay(2000);
   //servo1->setSpeed(0);
-  myservo1.write(90);
+  //myservo1.write(90);
+  delay(500);
+
+  myservo1.write(170);//170 up 90 down
+  myservo2.write(70);
 }
 
 // **Miscellaneous Functions**
@@ -608,7 +693,7 @@ char type_detection() {
 }
 
 // Routes
-void fourToGreen() {
+void fourToRed() {
     keep_straight();
     turn('R');
     keep_straight();
@@ -622,7 +707,7 @@ void fourToGreen() {
     keep_straight();
 }
 
-void fourToRed() {
+void fourToGreen() {
     keep_straight();
     turn('R');
     keep_straight();
@@ -640,7 +725,7 @@ void fourToRed() {
     keep_straight();
 }
 
-void oneToGreen() {
+void oneToRed() {
     keep_straight();
     turn('R');
     keep_straight();
@@ -648,7 +733,7 @@ void oneToGreen() {
     fourToGreen();
 }
 
-void oneToRed() {
+void oneToGreen() {
     keep_straight();
     turn('R');
     keep_straight();
@@ -656,7 +741,7 @@ void oneToRed() {
     fourToRed();
 }
 
-void twoToG() {
+void twoToR() {
     keep_straight();
     turn('L');
     runCar('F', 200, 10);
@@ -666,7 +751,7 @@ void twoToG() {
     keep_straight();
 }
 
-void twoToR() {
+void twoToG() {
     keep_straight();
     continue_straight();
     keep_straight();
@@ -681,22 +766,6 @@ void twoToR() {
     turn('L');
     keep_straight();
     continue_straight();
-    keep_straight();
-}
-
-void threeToG() {
-    keep_straight();
-    turn('L');
-    keep_straight();
-    continue_straight();
-    keep_straight();
-    turn('L');
-    keep_straight();
-    turn('R');
-    runCar('F', 200, 10);
-    drop_rubbish();
-    runCar('B', 200, 13 + CAR_WIDTH);
-    pure_turn('L');
     keep_straight();
 }
 
@@ -704,6 +773,22 @@ void threeToR() {
     keep_straight();
     turn('L');
     keep_straight();
+    continue_straight();
+    keep_straight();
+    turn('L');
+    keep_straight();
+    turn('R');
+    runCar('F', 200, 10);
+    drop_rubbish();
+    runCar('B', 200, 13 + CAR_WIDTH);
+    pure_turn('L');
+    keep_straight();
+}
+
+void threeToG() {
+    keep_straight();
+    turn('L');
+    keep_straight();
     turn('L');
     runCar('F', 200, 10);
     drop_rubbish();
@@ -716,13 +801,10 @@ void threeToR() {
     keep_straight();
 }
 
-char rubbish_type;
 
 void route() {
     runCar('F',200,10);
     keep_straight();
-    pick_up_rubbish();
-    rubbish_type = type_detection();
 
     turn('L');
 
@@ -733,7 +815,6 @@ void route() {
     }
 
     pick_up_rubbish();
-    rubbish_type = type_detection();
     turn('R');
     keep_straight();
     turn('R');
@@ -747,7 +828,6 @@ void route() {
     turn('L');
     keep_straight();
     pick_up_rubbish();
-    rubbish_type = type_detection();
     keep_straight();
     turn('L');
 
@@ -782,7 +862,6 @@ void route() {
     turn('R');
     keep_straight();
     pick_up_rubbish();
-    rubbish_type = type_detection();
     keep_straight();
     continue_straight();
 
@@ -820,6 +899,6 @@ void route() {
     keep_straight();
     turn('L');
     keep_straight();
-    runCar('F',200,2*CAR_LENGTH);
-    turnByMiddle('L',180);
+    turnByMiddle('R',200);
+    runCar('B',200,2*CAR_LENGTH);
 }
