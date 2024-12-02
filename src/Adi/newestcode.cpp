@@ -5,7 +5,7 @@
 
 // Constants
 const float COMPUTER_ACTUAL_SPEED_RATIO = 14.5; 
-const float SPEED_FACTOR = 1.18; // Speed adjustment factor based on weight
+const float SPEED_FACTOR = 1; // Speed adjustment factor based on weight
 const float CAR_WIDTH = 19; // cm
 const float ROTATIONAL_RADIUS = CAR_WIDTH / 2; // Half car width
 const float CAR_LENGTH = 15.5 - 1; // cm
@@ -13,17 +13,17 @@ const float RIGHT_LEFT_TURN_DIFFERENCE = 1;
 const float CLAW_LENGTH = 7;
 
 // Define digital ports
-const uint8_t LightSensorPin1 = 2;
+const uint8_t LightSensorPin1 = 6;
 const uint8_t LightSensorPin2 = 3;
 const uint8_t LightSensorPin3 = 4;
 const uint8_t LightSensorPin4 = 5;
-const uint8_t magneticSensorPin = A5;
+const uint8_t magneticSensorPin = A3;
 const uint8_t magneticSensorPin2 = A1;
-const uint8_t buttonPin = 6;
+// const uint8_t buttonPin = A2;
 const uint8_t blue_led = 8;
 const uint8_t green_led = 9;
 const uint8_t red_led = 10;
-const uint8_t on_switch = 0;
+const uint8_t on_switch = 7;
 
 
 /*
@@ -99,17 +99,17 @@ void setup() {
     setupInputSensor(LightSensorPin2);
     setupInputSensor(LightSensorPin3);
     setupInputSensor(LightSensorPin4);
-    setupInputSensor(buttonPin);
+  
+
     setupInputSensor(on_switch);
     setupInputSensor(sensityPin);
-    //initializeMotors();
+    initializeMotors();
     //pinMode(trigPin,
             //OUTPUT); // Sets the trigPin as an OUTPUT
     //pinMode(echoPin, INPUT); // Sets the echoPin as an INPUT
 
     // Serial Communication is starting with 9600 of
     // baudrate speed
-    Serial.begin(9600);
 
     // The text to be printed in serial monitor
     Serial.println(
@@ -136,7 +136,9 @@ void loop() {
     // turn('R');
     // keep_straight();
     // forward_and_turn('R',90);
-    // runCar('F',200,4);
+    // runCar('F',200,40);
+    // runCar('B',200,40);
+
     // keep_straight();
     
      while(digitalRead(on_switch)==HIGH){
@@ -152,6 +154,7 @@ void loop() {
     myservo1.write(170);//170 up 90 down
     myservo2.write(70);
     delay(1000);
+
      //myservo1.write(170);
      //while(digitalRead(button == LOW) && (digitalRead(on_switch)==LOW)){
       //myservo2.write(70);
@@ -174,7 +177,7 @@ void loop() {
     
     Serial.println(magnetic_value());
     //myservo1.write(-90);
-    //route();
+    route();
      // Pause for testing
 }
 
@@ -204,12 +207,7 @@ bool lightSensorIsWhite(uint8_t pin, uint8_t T_s) {
     return val;
 }
 
-bool button(){
-	//returns true if white pattern is detected underneath the light sensor
-	//returns false if black pattern is detected underneath the light sensor
-	bool val = (digitalRead(buttonPin) == HIGH);
-	return val;
-}
+
 float dist_t, sensity_t;
 
 int dist(){
@@ -264,6 +262,27 @@ float calculateRunTime(float distance, float real_speed) {
     return distance / real_speed;
 }
 
+void runCar(char direction, int speed, float distance) {
+    float real_speed = calculateRealSpeed(speed);
+    float time = calculateRunTime(distance, real_speed);
+    unsigned long startTime = millis();
+
+    if (direction == 'F') {
+        leftMotor->run(FORWARD);
+        rightMotor->run(FORWARD);
+    } else if (direction == 'B') {
+        leftMotor->run(BACKWARD);
+        rightMotor->run(BACKWARD);
+    } else return;
+
+    leftMotor->setSpeed(speed-5);
+    rightMotor->setSpeed(speed+10);
+
+    while (millis() - startTime < time * 1000) {}
+    leftMotor->run(RELEASE);
+    rightMotor->run(RELEASE);
+}
+
 // **Motor Control Functions**
 void runLeftMotor(char direction, int speed, float distance) {
     float real_speed = calculateRealSpeed(speed);
@@ -292,27 +311,6 @@ void runRightMotor(char direction, int speed, float distance) {
     rightMotor->setSpeed(speed);
 
     while (millis() - startTime < time * 1000) {}
-    rightMotor->run(RELEASE);
-}
-
-void runCar(char direction, int speed, float distance) {
-    float real_speed = calculateRealSpeed(speed);
-    float time = calculateRunTime(distance, real_speed);
-    unsigned long startTime = millis();
-
-    if (direction == 'F') {
-        leftMotor->run(FORWARD);
-        rightMotor->run(FORWARD);
-    } else if (direction == 'B') {
-        leftMotor->run(BACKWARD);
-        rightMotor->run(BACKWARD);
-    } else return;
-
-    leftMotor->setSpeed(speed);
-    rightMotor->setSpeed(speed);
-
-    while (millis() - startTime < time * 1000) {}
-    leftMotor->run(RELEASE);
     rightMotor->run(RELEASE);
 }
 
@@ -522,12 +520,17 @@ void keep_straight() {
            (lightSensorIsWhite(LightSensorPin3, 0) == 1) &&
            (lightSensorIsWhite(LightSensorPin1, 0) == 0) &&
            (lightSensorIsWhite(LightSensorPin4, 0) == 0)
-           && (dist()>=10) 
+           && (dist()>=7) 
            ){
+        digitalWrite(blue_led,HIGH);
+        //delay(10);
+        
         leftMotor->run(FORWARD);
         leftMotor->setSpeed(250);
         rightMotor->run(FORWARD);
         rightMotor->setSpeed(250);
+        //delay(490);
+        digitalWrite(blue_led,LOW);
         //Serial.println("keep_straight");
 
     }
@@ -565,6 +568,7 @@ void keep_straight() {
      //rightMotor->run(RELEASE);
 }
 
+char rubbish_type;
 void grab_rubbish() {
 
   Serial.println("go for grab");
@@ -584,13 +588,13 @@ void grab_rubbish() {
           delay(50);                       // waits 15ms for the servo to reach the position
         }
       }
-  while (pos2<=109) {
+  while (pos2<=110) {
       for (pos2 = 70; pos2 <= 110; pos2 += 1) { // goes from 0 degrees to 180 degrees
         myservo2.write(pos2);              // tell servo to go to position in variable 'pos'
         delay(50);                       // waits 15ms for the servo to reach the position        }
       }
   }
-  while (pos1<=169) {
+  while (pos1<=170) {
         for (pos1 = 90; pos1 <= 170; pos1 += 1) { // goes from 0 degrees to 180 degrees
           myservo1.write(pos1);              // tell servo to go to position in variable 'pos'
           delay(50);                       // waits 15ms for the servo to reach the position
@@ -631,11 +635,14 @@ void grab_rubbish() {
     digitalWrite(green_led,HIGH);
     delay(1000);
     digitalWrite(green_led,LOW);
+    rubbish_type='G';
   }
   else{
     digitalWrite(red_led,HIGH);
     delay(1000);
     digitalWrite(red_led,LOW);
+    rubbish_type='R';
+
   }
 
   Serial.println("lifted");
@@ -645,7 +652,7 @@ void grab_rubbish() {
 
 void drop_rubbish() {
   digitalWrite(blue_led,LOW);
-  myservo1.write(90);
+  //myservo1.write(90);
 
   //servo1->run(FORWARD);
   //servo1->setSpeed(150);
@@ -655,7 +662,7 @@ void drop_rubbish() {
   //servo2->setSpeed(150);
   //delay(2000)
   //servo2->setSpeed(0);
-  myservo2.write(110);
+  //myservo2.write(110);
 
   //servo1->run(BACKWARD);
   //servo1->setSpeed(150);
@@ -665,7 +672,7 @@ void drop_rubbish() {
   delay(500);
 
   myservo1.write(170);//170 up 90 down
-  myservo2.write(70);
+  myservo2.write(70);//open
 }
 
 // **Miscellaneous Functions**
@@ -691,30 +698,30 @@ char type_detection() {
 }
 
 // Routes
-void fourToGreen() {
+void fourToRed() {
     keep_straight();
     turn('R');
     keep_straight();
     turn('R');
     keep_straight();
     turn('R');
-    runCar('F', 200, 20);  // Move forward to align for drop
+    runCar('F', 200, 10);  // Move forward to align for drop
     drop_rubbish();
-    runCar('B', 200, 20 + CAR_WIDTH);
+    runCar('B', 200, 13 + CAR_WIDTH);
     pure_turn('L');  // Turn left
     keep_straight();
 }
 
-void fourToRed() {
+void fourToGreen() {
     keep_straight();
     turn('R');
     keep_straight();
     continue_straight();   
     keep_straight();
     turn('R');
-    runCar('F', 200, 20);  // Move forward to align for drop
+    runCar('F', 200, 10);  // Move forward to align for drop
     // drop_rubbish();
-    runCar('B', 200, 23 + CAR_WIDTH);
+    runCar('B', 200, 13 + CAR_WIDTH);
     pure_turn('R');  // Turn right
     keep_straight();
     turn('L');
@@ -723,7 +730,7 @@ void fourToRed() {
     keep_straight();
 }
 
-void oneToGreen() {
+void oneToRed() {
     keep_straight();
     turn('R');
     keep_straight();
@@ -731,7 +738,7 @@ void oneToGreen() {
     fourToGreen();
 }
 
-void oneToRed() {
+void oneToGreen() {
     keep_straight();
     turn('R');
     keep_straight();
@@ -739,47 +746,31 @@ void oneToRed() {
     fourToRed();
 }
 
-void twoToG() {
+void twoToR() {
     keep_straight();
     turn('L');
-    runCar('F', 200, 20);
+    runCar('F', 200, 10);
     drop_rubbish();
-    runCar('B', 200, 20 + CAR_WIDTH);
+    runCar('B', 200, 13 + CAR_WIDTH);
     pure_turn('L');
     keep_straight();
 }
 
-void twoToR() {
+void twoToG() {
     keep_straight();
     continue_straight();
     keep_straight();
     turn('R');
     keep_straight();
     turn('R');
-    runCar('F', 200, 20);
+    runCar('F', 200, 10);
     drop_rubbish();
-    runCar('B', 200, 23 + CAR_WIDTH);
+    runCar('B', 200, 13 + CAR_WIDTH);
     pure_turn('R');
     keep_straight();
     turn('L');
     keep_straight();
     continue_straight();
-    keep_straight();
-}
-
-void threeToG() {
-    keep_straight();
-    turn('L');
-    keep_straight();
-    continue_straight();
-    keep_straight();
-    turn('L');
-    keep_straight();
-    turn('R');
-    runCar('F', 200, 20);
-    drop_rubbish();
-    runCar('B', 200, 20 + CAR_WIDTH);
-    pure_turn('L');
     keep_straight();
 }
 
@@ -787,10 +778,26 @@ void threeToR() {
     keep_straight();
     turn('L');
     keep_straight();
+    continue_straight();
+    keep_straight();
     turn('L');
-    runCar('F', 200, 20);
+    keep_straight();
+    turn('R');
+    runCar('F', 200, 10);
     drop_rubbish();
-    runCar('B', 200, 23 + CAR_WIDTH);
+    runCar('B', 200, 13 + CAR_WIDTH);
+    pure_turn('L');
+    keep_straight();
+}
+
+void threeToG() {
+    keep_straight();
+    turn('L');
+    keep_straight();
+    turn('L');
+    runCar('F', 200, 10);
+    drop_rubbish();
+    runCar('B', 200, 13 + CAR_WIDTH);
     pure_turn('R');
     keep_straight();
     turn('L');
@@ -799,16 +806,12 @@ void threeToR() {
     keep_straight();
 }
 
-char rubbish_type;
 
 void route() {
     runCar('F',200,10);
     keep_straight();
-    pick_up_rubbish();
-    rubbish_type = type_detection();
 
-    claw_turn('L');
-    //turn('L');
+    turn('L');
 
     if (rubbish_type == 'G') {
         oneToGreen();
@@ -817,7 +820,6 @@ void route() {
     }
 
     pick_up_rubbish();
-    rubbish_type = type_detection();
     turn('R');
     keep_straight();
     turn('R');
@@ -831,7 +833,6 @@ void route() {
     turn('L');
     keep_straight();
     pick_up_rubbish();
-    rubbish_type = type_detection();
     keep_straight();
     turn('L');
 
@@ -866,7 +867,6 @@ void route() {
     turn('R');
     keep_straight();
     pick_up_rubbish();
-    rubbish_type = type_detection();
     keep_straight();
     continue_straight();
 
@@ -904,6 +904,6 @@ void route() {
     keep_straight();
     turn('L');
     keep_straight();
-    runCar('F',200,2*CAR_LENGTH);
-    turnByMiddle('L',180);
+    turnByMiddle('R',200);
+    runCar('B',200,2*CAR_LENGTH);
 }
