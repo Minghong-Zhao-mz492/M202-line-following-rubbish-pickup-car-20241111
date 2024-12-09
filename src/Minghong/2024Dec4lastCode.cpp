@@ -19,36 +19,20 @@ const uint8_t LightSensorPin3 = 4;
 const uint8_t LightSensorPin4 = 5;
 const uint8_t magneticSensorPin = A3;
 const uint8_t magneticSensorPin2 = A1;
-// const uint8_t buttonPin = A2;
 const uint8_t blue_led = 8;
 const uint8_t green_led = 9;
 const uint8_t red_led = 10;
 const uint8_t on_switch = 7;
 
-
-/*
-IDP
-David Paterson
-URM09 Ultrasonic Sensor test
-*/
-#define MAX_RANG (520)//the max measurement value of the module is 520cm(a little bit longer
-//than effective max range)
+#define MAX_RANG (520)//the max measurement value of the module is 520cm
 #define ADC_SOLUTION (1023.0)//ADC accuracy of Arduino UNO is 10bit
-int sensityPin = A0; // select the input pin
-//#define echoPin                                            \
-    8 // attach pin D2 Arduino to pin Echo of HC-SR04
-//#define trigPin                                            \
-    9 // attach pin D3 Arduino to pin Trig of HC-SR04   
 
 // Define analog ports
-//const uint8_t distanceSensorPin = A0; // Analog pin for distance sensor
+const uint_8 sensityPin = A0; // select the input pin
 
-Servo myservo1;  // create servo object to control a servo
-// twelve servo objects can be created on most boards
+//Define servo 
+Servo myservo1; 
 Servo myservo2;
-
-int pos = 0;    // variable to store the servo position
-
 
 // Motor Shield and Motor objects
 Adafruit_MotorShield AFMS = Adafruit_MotorShield();
